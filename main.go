@@ -1,22 +1,16 @@
 package main
 
 import (
-	"bw/animal_paths/gridpaths"
+	"bw/animal_paths/world"
+	"bw/animal_paths/world/continuous"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	world  *gridpaths.World
+	world  *world.World
 	pixels []byte
-}
-
-type World interface {
-	Width() float64 {
-		return 
-
-
 }
 
 func (g *Game) Update() error {
@@ -26,38 +20,31 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	if g.pixels == nil {
-		g.pixels = make([]byte, g.world.WIDTH*g.world.HEIGHT*4)
+		g.pixels = make([]byte, world.WIDTH*world.HEIGHT*4)
 	}
 	g.world.Draw(g.pixels)
 	screen.WritePixels(g.pixels)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return g.world.WIDTH, g.world.HEIGHT
+	return world.WIDTH, world.HEIGHT
 }
 
 func main() {
 
-	w := &gridpaths.World{
-		WIDTH:                300,
-		HEIGHT:               300,
-		FLATTEN_COEFFICIENT:  0.001,
-		MAX_COST:             2.0,
-		MIN_COST:             1.0,
-		RECOVERY_COEFFICIENT: 0.001,
-		ANIMALS:              100,
-		NEIGHBOR_FLATTEN:     0.9,
-		ALL_RANDOM:           false,
-		TORUS:                false,
-	}
+	w := &world.World{}
 
 	// Necessary to initialize the internal state
-	w.Initialize()
+	w.Initialize(continuous.InitializeAnimals(w))
+	//INITIAL_STEPS := 1000
+	//for i := 0; i < INITIAL_STEPS; i++ {
+	//	w.Update()
+	//}
 
 	g := &Game{world: w}
 
-	ebiten.SetMaxTPS(60)
-	ebiten.SetWindowSize(w.WIDTH*2, w.HEIGHT*2)
+	ebiten.SetTPS(60)
+	ebiten.SetWindowSize(world.WIDTH*2, world.HEIGHT*2)
 	ebiten.SetWindowTitle("animal paths")
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
