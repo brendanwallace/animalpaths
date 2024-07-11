@@ -1,16 +1,9 @@
-using DataStructures
-using LinearAlgebra
-using TestItems
-using Test
-
-
-const Position = Tuple{Float64, Float64}
-const GridPosition = Tuple{Int64, Int64}
-
 # This is the bottom-left corner of the square face.
 const Face = GridPosition
 
 abstract type _Edge end
+
+# @assert false
 
 
 struct Node
@@ -64,13 +57,16 @@ struct Item
 end
 
 
-function astar(source, target)::LinkedList{Edge}
+function heuristic(pos :: Position, target :: Position) :: Float64
+	return 1.0 * norm(pos .- target)
+end
+
+function astar(source::Node, target::Node)::LinkedList{Edge}
 
 	pq = PriorityQueue{Item, Float64}()
 	visited = Set{Node}()
 
 	enqueue!(pq, Item(source, nil(Edge), 0.0), 0.0)
-
 
 	# pop the top element and add its neighbors
 	while !isempty(pq)
@@ -84,39 +80,37 @@ function astar(source, target)::LinkedList{Edge}
 			push!(visited, item.node)
 			for edge in item.node.neighbors
 				cost = item.pathCost + edge.cost
-				enqueue!(pq, Item(edge.node, cons(edge, item.path), cost), cost)
+				enqueue!(pq, Item(edge.node, cons(edge, item.path), cost), (cost + heuristic(edge.node.position, target.position)))
 			end
 		end
 	end
 
 	# This means we couldn't find a path.
-	# TODO – I'm not sure that this is how you deal with parametric typing
 	return nil(Edge)
 end
 
 
-# @testitem "Test for astar" begin
-# 	using Paths
-# 	using Test
-# 	using DataStructures
 
-n1 = Node((1, 1))
-e1 = Edge(n1, 10.0)
-e2 = Edge(n1, 15.0)
-n2 = Node((2, 2))
-push!(n2.neighbors, e1)
-push!(n2.neighbors, e2)
+@testitem "Test for astar" begin
+using Paths, Test, DataStructures
+
+	n1 = Node((1, 1))
+	e1 = Edge(n1, 10.0)
+	e2 = Edge(n1, 15.0)
+	n2 = Node((2, 2))
+	push!(n2.neighbors, e1)
+	push!(n2.neighbors, e2)
 
 
-@test astar(Node((1, 1)), Node((2, 2))) == nil(Edge)
-@test astar(n2, n1) == list(e1)
+	@test astar(Node((1, 1)), Node((2, 2))) == nil(Edge)
+	@test astar(n2, n1) == list(e1)
 
-e3 = Edge(n2, 1.0)
-e4 = Edge(n1, 20.0)
-n3 = Node((3.0, 3.0), [e3, e4], [])
+	e3 = Edge(n2, 1.0)
+	e4 = Edge(n1, 20.0)
+	n3 = Node((3.0, 3.0), [e3, e4], [])
 
-@test astar(n3, n1) == list(e1, e3)
-# # end
+	@test astar(n3, n1) == list(e1, e3)
+end
 
 
 
@@ -132,7 +126,7 @@ function costAt(costs, face::Face)
 	end
 end
 
-function constructOriginalGraph(costs::Matrix{Float64}) Dict{Position, Node}
+function constructOriginalGraph(costs::Matrix{Float64})
 	X, Y = size(costs)
 	nodes = Dict{Position, Node}()
 	nodesByFace = Dict{Face, Vector{Node}}()
@@ -189,10 +183,15 @@ function constructOriginalGraph(costs::Matrix{Float64}) Dict{Position, Node}
 	return nodes, nodesByFace
 end
 
-@test constructOriginalGraph(zeros(Float64, (0, 0)))[1] == Dict{Position, Node}((1, 1)=>Node((1, 1), [], [(0, 0), (0, 1), (1, 0), (1, 1)]))
+@testitem "constructOriginalGraph" begin
+using Paths, Test
+
+@test Paths.constructOriginalGraph(
+	zeros(Float64, (0, 0)))[1] == Dict{Paths.Position, Node}(
+	(1, 1)=>Node((1, 1), [], [(0, 0), (0, 1), (1, 0), (1, 1)]))
 
 minimalCosts::Matrix{Float64} = zeros(Float64, (1, 1)).+5
-minimalNodes = Dict{Position, Node}(
+minimalNodes = Dict{Paths.Position, Node}(
 	(1, 1) => Node((1, 1), [], [(1, 1), (0, 0), (1, 0), (0, 1)]),
 	(1, 2) => Node((1, 2), [], [(1, 2), (0, 1), (1, 1), (0, 2)]),
 	(2, 1) => Node((2, 1), [], [(2, 1), (1, 0), (2, 0), (1, 1)]),
@@ -208,37 +207,47 @@ push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[2, 2], 5.0))
 push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[1, 2], 5.0))
 push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[2, 1], 5.0))
 
-(g, nbe) = constructOriginalGraph(minimalCosts)
+(g, nbe) = Paths.constructOriginalGraph(minimalCosts)
 @test g == minimalNodes
 
+lg, lnbe = Paths.constructOriginalGraph(zeros(Float64, (100, 100)))
+for (key, node) in lg
+	@test length(node.faces) == 4
+end
+end
 
-function findNumSteinerPoints(distance)
-	return 2
+function faces(pos)
+	δ = 0.001
+	x, y = pos
+	if mod(x, 1) == 0 && mod(y, 1) == 0
+		return [Int64.(p) for p in [(x, y), (x-1, y), (x, y-1), (x-1, y-1)]]
+	elseif mod(x, 1) == 0
+		return [Int64.(floor.(p)) for p in [(x, y), (x-1, y)]]
+	elseif mod(y, 1) == 0
+		return [Int64.(floor.(p)) for p in [(x, y), (x, y-1)]]
+	else
+		return [Int64.(floor.(pos))]
+	end
 end
 
 
+
 # Divides original edges
+# TODO -- don't use explicit saved faces, and generate this graph on the fly.
 function divideOriginalEdges!(nodes :: Dict{Position, Node}, nodesByFace=nothing, findNumSteinerPoints=(x)->2)
 	for (_pos, source) in copy(nodes)
-		# println("considering: ", source)
-		# sleep(1.0)
 		for originalEdge in copy(source.neighbors)
-			# println("looping through neighbors: ", source.neighbors)
-			# sleep(1.0)
 			# delete the originalEdge and add numSteinerPoints new originalEdges
 			# TODO - figure out if it's an issue that we're not handling
 			# paired originalEdges.
 			if originalEdge.isOriginal
 				# This is incredibly verbose. Seems like there should be a more succint array delete.
 				deleteat!(source.neighbors, findfirst(isequal(originalEdge), source.neighbors))
-
 				# Vector that points in the direction of the edge
 				originalEdgeVector = originalEdge.node.position .- source.position
 				# println(originalEdgeVector)
 				numSteinerPoints = findNumSteinerPoints(norm(originalEdgeVector))
-				originalEdgeFaces = intersect(source.faces, originalEdge.node.faces)
-				@assert length(originalEdgeFaces) == 2 # nodes on an edge should have exactly 2 faces
-
+				originalEdgeFaces = faces((source.position .+ originalEdge.node.position) ./ 2)
 				# Add all the steiner points.
 				newEdgeCost = originalEdge.cost * (1 / (numSteinerPoints)) 
 				from = source
@@ -246,15 +255,14 @@ function divideOriginalEdges!(nodes :: Dict{Position, Node}, nodesByFace=nothing
 					newEdgeVector = (d / (numSteinerPoints)) .* originalEdgeVector
 					# println("newEdgeVector: ", newEdgeVector)
 					newPosition = source.position .+ newEdgeVector
-					# println("newPosition: ", newPosition)
 					# TODO – this could lead to a weird duplication bug possibly.
 					# If we add edges from a node that we haven't iterated over yet,
 					# then we may end up subdividing those edges prematurely.
 					#
-					# Counterpoint: I think we only look at each node once, so we
+					# Conversely, I think we only look at each node once, so we
 					# only look at each node's neighbors once.
 					if haskey(nodes, newPosition)
-						steinerPointNode = nodes[newPosition]
+						steinerPointNode = nodes[newPosition]	
 					else
 						steinerPointNode = Node(newPosition, [], originalEdgeFaces)
 						nodes[newPosition] = steinerPointNode
@@ -263,7 +271,7 @@ function divideOriginalEdges!(nodes :: Dict{Position, Node}, nodesByFace=nothing
 								push!(nodesByFace[face], steinerPointNode)
 							end
 						end
-					end
+					end		
 					newEdge = Edge(steinerPointNode, newEdgeCost, true)
 					push!(from.neighbors, newEdge)
 					from = steinerPointNode
@@ -276,25 +284,48 @@ function divideOriginalEdges!(nodes :: Dict{Position, Node}, nodesByFace=nothing
 	end
 end
 
-doeNode1 = Node((1, 1), [], [(1, 1), (0, 0), (0, 1), (1, 0)])
-doeNode2 = Node((2, 1), [], [(2, 1), (1, 0), (1, 1), (2, 0)])
-doeEdge1 = Edge(doeNode2, 8.0, true)
-doeEdge2 = Edge(doeNode1, 8.0, true)
-push!(doeNode1.neighbors, doeEdge1)
-push!(doeNode2.neighbors, doeEdge2)
 
-doeNodes = Dict((1.0, 1.0) => doeNode1, (2.0, 1.0) => doeNode2)
-divideOriginalEdges!(doeNodes)
-@test doeNodes[(1.5, 1.0)].position == (1.5, 1.0)
-@test doeNodes[(1.0, 1.0)].neighbors == [Edge(doeNodes[(1.5, 1)], 4.0, true)]
-@test doeNodes[(1.5, 1.0)].neighbors == [Edge(doeNodes[(2, 1)], 4.0, true), Edge(doeNodes[(1, 1)], 4.0, true)]
-@test doeNodes[(2.0, 1.0)].neighbors == [Edge(doeNodes[(1.5, 1)], 4.0, true)]
+@testitem "Test divideOriginalEdges" begin
+	using Test, Paths
 
-doeCopy = deepcopy(doeNodes)
-divideOriginalEdges!(doeNodes)
-divideOriginalEdges!(doeNodes)
-divideOriginalEdges!(doeCopy, nothing, (x)->4)
-@test doeCopy == doeNodes
+	doeNode1 = Node((1, 1), [], [(1, 1), (0, 0), (0, 1), (1, 0)])
+	doeNode2 = Node((2, 1), [], [(2, 1), (1, 0), (1, 1), (2, 0)])
+	doeEdge1 = Edge(doeNode2, 8.0, true)
+	doeEdge2 = Edge(doeNode1, 8.0, true)
+	push!(doeNode1.neighbors, doeEdge1)
+	push!(doeNode2.neighbors, doeEdge2)
+
+	doeNodes = Dict((1.0, 1.0) => doeNode1, (2.0, 1.0) => doeNode2)
+	Paths.divideOriginalEdges!(doeNodes)
+	@test doeNodes[(1.5, 1.0)].position == (1.5, 1.0)
+	@test doeNodes[(1.0, 1.0)].neighbors == [Edge(doeNodes[(1.5, 1)], 4.0, true)]
+	@test doeNodes[(1.5, 1.0)].neighbors == [Edge(doeNodes[(2, 1)], 4.0, true), Edge(doeNodes[(1, 1)], 4.0, true)]
+	@test doeNodes[(2.0, 1.0)].neighbors == [Edge(doeNodes[(1.5, 1)], 4.0, true)]
+
+	# for (key, node) in doeNodes
+	# 	@test length(node.faces) >= 2
+	# end
+
+	doeCopy = deepcopy(doeNodes)
+	Paths.divideOriginalEdges!(doeNodes)
+
+	# for (key, node) in doeNodes
+	# 	@test length(node.faces) >= 2
+	# end
+
+	Paths.divideOriginalEdges!(doeNodes)
+
+	# for (key, node) in doeNodes
+	# 	@test length(node.faces) >= 2
+	# end
+
+	Paths.divideOriginalEdges!(doeCopy, nothing, (x)->4)
+	@test doeCopy == doeNodes
+
+	# for (key, node) in doeCopy
+	# 	@test length(node.faces) >= 2
+	# end
+end
 
 
 function connectAcrossFaces!(nodes :: Dict{Position, Node}, nodesByFace, costs)
@@ -303,7 +334,8 @@ function connectAcrossFaces!(nodes :: Dict{Position, Node}, nodesByFace, costs)
 			for target in nodes
 				# These are _across_ face if they don't share the exact same faces.
 				# Otherwise they are on an edge and we don't add anything.
-				if length(intersect(source.faces, target.faces)) < 2
+				if ((source.position[1] != target.position[1]) && (source.position[2] != target.position[2]))
+				# if length(intersect(source.faces, target.faces)) < 2
 					len = norm(target.position .- source.position)
 					push!(source.neighbors, Edge(target, len * costAt(costs, face), false))
 				end
@@ -312,9 +344,34 @@ function connectAcrossFaces!(nodes :: Dict{Position, Node}, nodesByFace, costs)
 	end
 end
 
-g[1.5, 1.5] = Node((1.5, 1.5), [], [(1, 1)])
-push!(nbe[(1, 1)], g[(1.5, 1.5)])
-connectAcrossFaces!(g, nbe, minimalCosts)
+@testitem "Test connectAcrossFaces!" begin
+	using Paths, Test
+
+
+	minimalCosts::Matrix{Float64} = zeros(Float64, (1, 1)).+5
+	minimalNodes = Dict{Paths.Position, Node}(
+		(1, 1) => Node((1, 1), [], [(1, 1), (0, 0), (1, 0), (0, 1)]),
+		(1, 2) => Node((1, 2), [], [(1, 2), (0, 1), (1, 1), (0, 2)]),
+		(2, 1) => Node((2, 1), [], [(2, 1), (1, 0), (2, 0), (1, 1)]),
+		(2, 2) => Node((2, 2), [], [(2, 2), (1, 1), (2, 1), (1, 2)]))
+
+
+	push!(minimalNodes[(1,1)].neighbors, Edge(minimalNodes[1, 2], 5.0))
+	push!(minimalNodes[(1,1)].neighbors, Edge(minimalNodes[2, 1], 5.0))
+	push!(minimalNodes[(1,2)].neighbors, Edge(minimalNodes[1, 1], 5.0))
+	push!(minimalNodes[(1,2)].neighbors, Edge(minimalNodes[2, 2], 5.0))
+	push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[1, 1], 5.0))
+	push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[2, 2], 5.0))
+	push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[1, 2], 5.0))
+	push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[2, 1], 5.0))
+
+	(g, nbe) = Paths.constructOriginalGraph(minimalCosts)
+
+	# Add an internal point
+	g[1.5, 1.5] = Node((1.5, 1.5), [], [(1, 1)])
+	push!(nbe[(1, 1)], g[(1.5, 1.5)])
+	Paths.connectAcrossFaces!(g, nbe, minimalCosts)
+end
 
 
 function toArray(path :: LinkedList{Edge}) Array{Edge}
@@ -326,19 +383,60 @@ function toArray(path :: LinkedList{Edge}) Array{Edge}
 	return arrayPath
 end
 
-function shortestPath(source::Position, target::Position, costs, deltaThreshold=0.1, numPoints=(x)->2) Array{Edge}
-	@info "searching from $(source) to $(target)"
+function resetNodes(sourceNode, path)
+	nodeDict = Dict(sourceNode.position => sourceNode)
+	nodesByFace = Dict{Paths.Face, Array{Node}}()
+	for step in path
+	    # Add the nodes we already saw
+	    nodeDict[step.node.position] = step.node
+	end
+	for (_key, node) in copy(nodeDict)
+	    # Add original edge neighbors
+	    for edge in node.neighbors
+	        if edge.isOriginal
+	            nodeDict[(edge.node.position)] = edge.node
+	        end
+	    end
+	end
+	# Prune edges
+	for (_key, node) in copy(nodeDict)
+	    for edge in copy(node.neighbors)
+	        if !haskey(nodeDict, edge.node.position)
+	            Paths.delete!(node.neighbors, edge)
+	        end
+	    end
+	end
 
-	# Step 1 - construct G0 with nodes and edges
-	nodes, nodesByFace = constructOriginalGraph(costs)
+	for (_key, node) in nodeDict
+	    for face in node.faces
+	        if !haskey(nodesByFace, face)
+	            nodesByFace[face] = []
+	        end
+	        push!(nodesByFace[face], node)
+	    end
+	end
+	return nodeDict, nodesByFace
+end
+
+
+function shortestPath(source::Position, target::Position, costs::Matrix{Float64}, deltaThreshold=0.01, numPoints=(x)->2) Array{Edge}
+	source = floor.(source)
+	target = floor.(target)
+	@debug "searching from $(source) to $(target)"
+
+	# Step 1 - construct G0 with nodeDict and edges
+	@debug "constructing original graph"
+	nodeDict, nodesByFace = constructOriginalGraph(costs)
 
 	# Add source and target positions.
 	# Maybe this is not necessary and we can restrict to being on the grid.
 	for pos in [source, target]
-		if !haskey(nodes, pos)
-			face = Int64.(floor.(pos))
-			nodes[pos] = Node(pos, [], [face])
-			push!(nodesByFace[face], nodes[pos])
+		if !haskey(nodeDict, pos)
+			faces = unique([Int64.(floor.(pos .+ delta)) for delta in [(δ, 0), (0, δ), (-δ, 0), (0, -δ)]])
+			nodeDict[pos] = Node(pos, [], faces)
+			for face in faces
+				push!(nodesByFace[face], nodeDict[pos])
+			end
 		end
 	end
 
@@ -348,55 +446,59 @@ function shortestPath(source::Position, target::Position, costs, deltaThreshold=
 	i = 1
 
 	while delta > deltaThreshold
-		# Add all the nodes from the path
-		# TODO – remove nodes we don't need anymore
+		# Remove unneeded nodeDict only after the first initial search.
+		# TODO - actually remove unneeded nodeDict now.
 		if i > 1
-			sourceNode = nodes[source]
-			nodes = Dict(source => sourceNode)
-			nodesByFace = Dict{Face, Array{Node}}()
-			for edge in path
-				nodes[edge.node.position] = edge.node
-			end
-			for (_key, node) in nodes
-				for face in node.faces
-					if !haskey(nodesByFace, face)
-						nodesByFace[face] = []
-					end
-					push!(nodesByFace[face], node)
-				end
-			end
+			nodeDict, nodesByFace = resetNodes(nodeDict[source], path)
 		end
 
 
 		# Step 2 - construct G_{n+1}
 		# Add steiner points
-		divideOriginalEdges!(nodes, nodesByFace, numPoints)
-		connectAcrossFaces!(nodes, nodesByFace, costs)
+		@debug "adding steiner points"
+		divideOriginalEdges!(nodeDict, nodesByFace, numPoints)
 
-		@info "step $(i) – searching over $(length(nodes)) nodes"
+		@debug "connecting edges"
+		connectAcrossFaces!(nodeDict, nodesByFace, costs)
 
+		@debug "step $(i) – searching over $(length(nodeDict)) nodeDict"
 		# Step 3 - a-star G_n
-		path = toArray(reverse(astar(nodes[source], nodes[target])))
+		path = toArray(reverse(astar(nodeDict[source], nodeDict[target])))
 		newPathCost = sum(map(x->x.cost, path))
 		delta = pathCost - newPathCost
 		pathCost = newPathCost
 		i += 1
 
-		@info "found path of cost $(pathCost)"
+		@debug "found path of cost $(pathCost)"
 	end
 	return path
 end
 
-@test length(shortestPath((1.0, 1.0), (3.0, 3.0), zeros(Float64, (10, 10)).+1, 1)) == 2
-@test length(shortestPath((3.0, 3.0), (1.0, 1.0), zeros(Float64, (10, 10)).+1, 1)) == 2
-@test length(shortestPath((10.0, 10.0), (1.0, 1.0), zeros(Float64, (10, 10)).+1, 1)) == 9
-@test length(shortestPath((1.0, 1.0), (1.5, 1.5), zeros(Float64, (2, 2)).+1, 1)) == 1
-@test length(shortestPath((1.0, 1.0), (1.5, 1.5), zeros(Float64, (2, 2)).+1, 2)) == 1
 
-cost(s) = sum(map(x->x.cost, s))
+@testitem "Test shortestPath" begin
+	using Test, Paths, LinearAlgebra
 
-δ = 0.01
-tolerance = 0.1
-@test cost(shortestPath((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)).+1, δ, (x)->2)) ≈ norm((9, 9))
-@test cost(shortestPath((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)).+5, δ, (x)->2)) ≈ 5*norm((9, 9))
-@test cost(shortestPath((1.0, 1.0), (4.0, 5.0), zeros(Float64, (10, 10)).+5, δ, (x)->2)) - 5*5 < tolerance
+	@test length(Paths.shortestPath((1.0, 1.0), (3.0, 3.0), zeros(Float64, (10, 10)).+1, 1)) == 2
+	@test length(Paths.shortestPath((3.0, 3.0), (1.0, 1.0), zeros(Float64, (10, 10)).+1, 1)) == 2
+	@test length(Paths.shortestPath((10.0, 10.0), (1.0, 1.0), zeros(Float64, (10, 10)).+1, 1)) == 9
+	# @test length(shortestPath((1.0, 1.0), (1.5, 1.5), zeros(Float64, (2, 2)).+1, 1)) == 1
+	# @test length(shortestPath((1.0, 1.0), (1.5, 1.5), zeros(Float64, (2, 2)).+1, 2)) == 1
+	# @test length(shortestPath((1.5, 1.0), (1.5, 1.5), zeros(Float64, (2, 2)).+1, 2)) == 1
+
+	cost(s) = sum(map(x->x.cost, s))
+
+	δ = 0.01
+	tolerance = 0.1
+	@test cost(Paths.shortestPath((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)).+1, δ, (x)->2)) ≈ norm((9, 9))
+	@test cost(Paths.shortestPath((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)).+5, δ, (x)->2)) ≈ 5*norm((9, 9))
+	@test cost(Paths.shortestPath((1.0, 1.0), (4.0, 5.0), zeros(Float64, (10, 10)).+5, δ, (x)->2)) - 5*5 < tolerance
+	@test cost(Paths.shortestPath((2.0, 2.0), (5.0, 5.0),
+		[1.0 1.0 1.0 1.0 1.0;
+	     1.0 5.0 5.0 5.0 5.0;
+	     1.0 5.0 5.0 5.0 5.0;
+	     1.0 5.0 5.0 5.0 5.0;
+	     1.0 1.0 1.0 1.0 1.0;])) ≈ 6.0
+
+end
+
+

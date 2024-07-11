@@ -41,9 +41,6 @@ class World():
 		self.patch_improvement = patch_improvement
 		self.max_cost = max_cost
 
-
-
-
 	def update(self):
 		self.recover_patches()
 
