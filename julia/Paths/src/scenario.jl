@@ -3,6 +3,7 @@ struct Scenario <: AbstractScenario
     locations #:: (simulation::Simulation) -> Array{Location}
     walkers #:: (simulation::Simulation) -> Array{Walker}
     newTarget! #:: (simulation::Simulation, walker::Walker)
+    description :: String
 end
 
 
@@ -17,7 +18,8 @@ end
 
 RANDOM_FIXED::Scenario = Scenario(randomLocations, randomWalkers, 
 	# newRandomTarget
-	(walker) -> walker.target = rand(walker.simulation.locations);
+	((walker) -> walker.target = rand(walker.simulation.locations)),
+	"randomFixed",
 )
 
 
@@ -31,4 +33,5 @@ function newRandomDynamicLocation(walker)
 	push!(walker.simulation.locations, walker.target)
 end
 
-RANDOM_DYNAMIC::Scenario = Scenario((_x, _y)->[], randomWalkers, newRandomDynamicLocation)
+RANDOM_DYNAMIC::Scenario = Scenario((_x, _y)->[], randomWalkers,
+	newRandomDynamicLocation, "randomDynamic")

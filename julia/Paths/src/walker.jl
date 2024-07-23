@@ -6,7 +6,7 @@ mutable struct SearchWalker <: Walker
 	simulation :: Simulation
 	target :: Union{Location, Nothing}
 	position :: Tuple{Float64, Float64}
-	path :: Array{Edge}
+	path :: Array{Node}
 	SearchWalker(simulation, target, position) = new(simulation, target, position, [])
 end
 
@@ -14,7 +14,7 @@ end
 function update!(walker :: SearchWalker)
 	if walker.target isa Nothing
 		walker.simulation.scenario.newTarget!(walker)
-		walker.path = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world.patches))
+		walker.path, _cost = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world.patches))
 	end
 
 	traveled = 0.0
@@ -22,19 +22,19 @@ function update!(walker :: SearchWalker)
 		if length(walker.path) == 0
 			@debug "walker ran out of path at $(walker.position) without arriving at $(walker.target.position)."
 			walker.simulation.scenario.newTarget!(walker)
-			walker.path = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world.patches))
+			walker.path, _cost = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world.patches))
 			# TODO – could require that we actually hit a new target, and then we could keep walking.
 			break
 		end
-		nextEdge = walker.path[1]
+		nextNode = walker.path[1]
 		# This should be in the middle of the correct square.
 		# TODO -- this should put more weight into the face which has lower cost if
 		# we're walking right along an edge.
-		improvePosition = (nextEdge.node.position .+ walker.position) ./ 2
-		nextEdgeLength = norm(nextEdge.node.position .- walker.position)
+		improvePosition = (nextNode.position .+ walker.position) ./ 2
+		nextEdgeLength = norm(nextNode.position .- walker.position)
 		facesToImprove = faces(improvePosition)
 		if (traveled + nextEdgeLength) < WALKER_SPEED
-			walker.position = nextEdge.node.position
+			walker.position = nextNode.position
 			for face in facesToImprove
 				improvePatch!(walker.simulation.world, face, nextEdgeLength / length(facesToImprove))
 			end
@@ -42,7 +42,7 @@ function update!(walker :: SearchWalker)
 			popfirst!(walker.path)
 		else
 			distanceToTravel = WALKER_SPEED - traveled
-			walker.position = walker.position .+ (distanceToTravel .* (nextEdge.node.position .- walker.position))
+			walker.position = walker.position .+ (distanceToTravel .* (nextNode.position .- walker.position))
 			for face in facesToImprove
 				improvePatch!(walker.simulation.world, face, distanceToTravel / length(facesToImprove))
 			end

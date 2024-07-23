@@ -3,12 +3,10 @@ module Paths
 using Dates: now
 using Plots
 using Random
-using LinearAlgebra: norm
-using DataStructures: LinkedList, cons, nil, PriorityQueue, enqueue!, dequeue!
 using Test, TestItems
 
 export update!, Simulation, RANDOM_FIXED, RANDOM_DYNAMIC
-export Node, Edge, astar, shortestPath
+export Node, Edge, shortestPath
 
 include("common.jl")
 include("search.jl")
@@ -57,7 +55,7 @@ function main(
     save=true,
 )
 
-    filetext = "animations/$(now())|$(X)x$(Y)|UPF=$(upf)|pI=$(pI)|pR=$(pR)|T=$(T).gif"
+    filetext = "animations/$(scenario.description)|$(X)x$(Y)|pI=$(pI)|pR=$(pR)|UPF=$(upf)|T=$(T).gif"
 
 
     Random.seed!(2)
@@ -85,5 +83,33 @@ function main(
         gif(anim, filetext, fps = fps)
     end
 end
+
+function profilemain(
+    ;T=1000,
+    upf=2,
+    X=100,
+    Y=100,
+    numWalkers = 10,
+    numLocations = 10,
+    pI = 0.05,
+    pR = 0.0005,
+    scenario = RANDOM_FIXED,
+    # TODO -- maxCost= 2.0,
+    fps=30,
+)
+
+    @info "Creating simulation. $(X)x$(Y), $(numWalkers) walkers, $(numLocations) locations, UPF:$(upf), Frames:$(T)";
+    @info "Creating simulation. patchImprovement: $(pI), patchRecovery: $(pR), maxCost: $(MAX_COST)"
+
+    sim::Simulation = MakeSimulation(
+        X=X, Y=Y, numWalkers=numWalkers, numLocations=numLocations,
+        patchImprovement=pI, patchRecovery=pR,
+        scenario=scenario, maxCost=MAX_COST)
+
+    for t in 1:T
+        update!(sim)
+    end
+end
+
 
 end # module Paths
