@@ -20,11 +20,6 @@ end
 normalize(x) = x / norm(x)
 
 
-function costs(patches :: Matrix{Float64})
-    # TODO - verify this
-    return MAX_COST .* (1.0 .- patches) .+ (1.0 .* patches)
-end
-
 # It's wild that this doesn't already exist.
 function delete!(array, element)
     deleteat!(array, findall(isequal(element), array))

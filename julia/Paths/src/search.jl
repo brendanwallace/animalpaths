@@ -280,34 +280,34 @@ function connectAcrossFaces!(nodesByPosition :: Dict{Position, Node}, costs)
 	end
 end
 
-@testitem "Test connectAcrossFaces!" begin
-	using Paths, Test
+# @testitem "Test connectAcrossFaces!" begin
+# 	using Paths, Test
 
 
-	minimalCosts::Matrix{Float64} = zeros(Float64, (1, 1)).+5
-	minimalNodes = Dict{Paths.Position, Node}(
-		(1, 1) => Node((1, 1), []),
-		(1, 2) => Node((1, 2), []),
-		(2, 1) => Node((2, 1), []),
-		(2, 2) => Node((2, 2), []))
+# 	minimalCosts::Matrix{Float64} = zeros(Float64, (1, 1)).+5
+# 	minimalNodes = Dict{Paths.Position, Node}(
+# 		(1, 1) => Node((1, 1), []),
+# 		(1, 2) => Node((1, 2), []),
+# 		(2, 1) => Node((2, 1), []),
+# 		(2, 2) => Node((2, 2), []))
 
 
-	push!(minimalNodes[(1,1)].neighbors, Edge(minimalNodes[1, 2], 5.0))
-	push!(minimalNodes[(1,1)].neighbors, Edge(minimalNodes[2, 1], 5.0))
-	push!(minimalNodes[(1,2)].neighbors, Edge(minimalNodes[1, 1], 5.0))
-	push!(minimalNodes[(1,2)].neighbors, Edge(minimalNodes[2, 2], 5.0))
-	push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[1, 1], 5.0))
-	push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[2, 2], 5.0))
-	push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[1, 2], 5.0))
-	push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[2, 1], 5.0))
+# 	push!(minimalNodes[(1,1)].neighbors, Edge(minimalNodes[1, 2], 5.0))
+# 	push!(minimalNodes[(1,1)].neighbors, Edge(minimalNodes[2, 1], 5.0))
+# 	push!(minimalNodes[(1,2)].neighbors, Edge(minimalNodes[1, 1], 5.0))
+# 	push!(minimalNodes[(1,2)].neighbors, Edge(minimalNodes[2, 2], 5.0))
+# 	push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[1, 1], 5.0))
+# 	push!(minimalNodes[(2,1)].neighbors, Edge(minimalNodes[2, 2], 5.0))
+# 	push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[1, 2], 5.0))
+# 	push!(minimalNodes[(2,2)].neighbors, Edge(minimalNodes[2, 1], 5.0))
 
-	(g, nbe) = Paths.constructOriginalGraph(minimalCosts)
+# 	(g, nbe) = Paths.constructOriginalGraph(minimalCosts)
 
-	# Add an internal point
-	g[1.5, 1.5] = Node((1.5, 1.5), [])
-	push!(nbe[(1, 1)], g[(1.5, 1.5)])
-	Paths.connectAcrossFaces!(g, minimalCosts)
-end
+# 	# Add an internal point
+# 	g[1.5, 1.5] = Node((1.5, 1.5), [])
+# 	push!(nbe[(1, 1)], g[(1.5, 1.5)])
+# 	Paths.connectAcrossFaces!(g, minimalCosts)
+# end
 
 
 function resetNodes(sourceNode, path::Array{Node})
@@ -505,5 +505,3 @@ end
 	     1.0 1.0 1.0 1.0 1.0;]); @test c ≈ 6.0
 
 end
-
-

@@ -1,23 +1,62 @@
 const DIFFUSION_RADIUS = 3
-const DIFFUSION_GAUSSIAN_VARIANCE = 2.0
+const DIFFUSION_GAUSSIAN_VARIANCE = 1.0
 const τ = 2*π
+
+@enum PatchLogic begin
+	Linear
+	Logistic
+	Saturating
+end
 
 struct World <: AbstractWorld
     X::Int
     Y::Int
-    simulation :: Simulation
+    maxCost::Float64
+    simulation # :: Simulation
+    # Measures the amount a patch has improved. 0 is no improvement.
     patches::Array{Float64}
-    World(x, y, simulation) = new(x, y, simulation, zeros(Float64, (x, y)))
+    improvementLogic::PatchLogic
+    recoveryLogic::PatchLogic
+    World(x, y, maxCost, simulation, improvementLogic, recoveryLogic) = new(
+    	x, y, maxCost, simulation, zeros(Float64, (x, y)), improvementLogic, recoveryLogic)
 end
 
+
 function update!(world :: World)
-	world.patches .-= world.simulation.patchRecovery
-	world.patches .= clamp!(world.patches, 0.0, 1.0) 
+	r = world.simulation.patchRecovery 
+
+	if world.recoveryLogic == Linear
+		world.patches .-= r
+	elseif world.recoveryLogic == Saturating
+		world.patches .-= (r .* (1 .- world.patches))
+	elseif world.recoveryLogic == Logistic
+		world.patches .-= (r .* (1 .- world.patches) .* world.patches)
+	end
+
+	world.patches .= clamp!(world.patches, 0.0, 1.0)
+end
+
+
+
+function costs(world::AbstractWorld)
+    return world.maxCost .* (1.0 .- world.patches) .+ (1.0 .* world.patches)
 end
 
 
 function _improvePatch!(world, x::Int, y::Int, improvement::Float64)
-	world.patches[x, y] += improvement
+	r = improvement
+
+	# It's necessary to add this, otherwise improvement=0 becomes an absorbing state.
+	ϵ = 0.1
+
+	if world.improvementLogic == Linear
+		world.patches[x, y] += r
+	elseif world.improvementLogic == Saturating
+		world.patches[x, y] += (r * (1 - world.patches[x, y]))
+	elseif world.improvementLogic == Logistic
+		world.patches[x, y] += (r * (1 - world.patches[x, y]) * (world.patches[x, y] + ϵ))
+	end
+
 end
 
 function gaussianDiffusion(μ, σ2, dx, dy)

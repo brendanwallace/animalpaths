@@ -5,7 +5,6 @@ mutable struct Simulation
 	scenario :: AbstractScenario
 	patchImprovement :: Float64
 	patchRecovery :: Float64
-	maxCost :: Float64
 
 	Simulation() = new()
 end
@@ -32,10 +31,10 @@ end
 # 	scenario = RANDOM_FIXED, maxCost=MAX_COST) :: Simulation
 
 function MakeSimulation(;X, Y, numWalkers, numLocations, patchImprovement,
-	patchRecovery, scenario, maxCost) :: Simulation
+	patchRecovery, scenario, maxCost, improvementLogic, recoveryLogic) :: Simulation
 	
 	sim = Simulation()
-	sim.world = World(X, Y, sim);
+	sim.world = World(X, Y, maxCost, sim, improvementLogic, recoveryLogic);
 	sim.walkers = scenario.walkers(sim, numWalkers);
 	sim.locations = scenario.locations(sim, numLocations);
 	sim.scenario = scenario;
@@ -43,7 +42,6 @@ function MakeSimulation(;X, Y, numWalkers, numLocations, patchImprovement,
 	# Options
 	sim.patchImprovement = patchImprovement
 	sim.patchRecovery = patchRecovery
-	sim.maxCost = maxCost
 
 	return sim
 end
@@ -55,7 +53,7 @@ end
 	Random.seed!(1)
 	sim = Paths.MakeSimulation(numWalkers=1, numLocations=1, X=10, Y=10,
 		patchImprovement=0.05, patchRecovery=0.0005,
-		scenario=Paths.RANDOM_FIXED, maxCost=2.0)
+		scenario=Paths.RANDOM_FIXED, maxCost=2.0, improvementLogic=Paths.Logistic, recoveryLogic=Paths.Logistic)
 	@test sim isa Simulation
 	for i in 1:2
 		# print("\ri$(i)")
@@ -66,7 +64,7 @@ end
 	Random.seed!(1)
 	sim = Paths.MakeSimulation(numWalkers=1, numLocations=1, X=10, Y=10,
 		patchImprovement=0.05, patchRecovery=0.0005,
-		scenario=Paths.RANDOM_DYNAMIC, maxCost=2.0)
+		scenario=Paths.RANDOM_DYNAMIC, maxCost=2.0, improvementLogic=Paths.Logistic, recoveryLogic=Paths.Logistic)
 	@test sim isa Simulation
 	for i in 1:2
 		# print("\ri$(i)")

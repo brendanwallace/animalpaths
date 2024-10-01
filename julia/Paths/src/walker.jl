@@ -14,15 +14,17 @@ end
 function update!(walker :: SearchWalker)
 	if walker.target isa Nothing
 		walker.simulation.scenario.newTarget!(walker)
-		walker.path, _cost = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world.patches))
+		walker.path, _cost = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world))
 	end
 
 	traveled = 0.0
 	while traveled < WALKER_SPEED
 		if length(walker.path) == 0
 			@debug "walker ran out of path at $(walker.position) without arriving at $(walker.target.position)."
+			prevTarget = walker.target
+
 			walker.simulation.scenario.newTarget!(walker)
-			walker.path, _cost = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world.patches))
+			walker.path, _cost = shortestPath(walker.position, walker.target.position, costs(walker.simulation.world))
 			# TODO – could require that we actually hit a new target, and then we could keep walking.
 			break
 		end
