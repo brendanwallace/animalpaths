@@ -1,6 +1,6 @@
 name = "Paths"
 uuid = "4a712326-4906-46e3-95f2-b945078f68f6"
-authors = ["brendan <bwallace722@gmail.com>"]
+authors = ["brendan <b.wallace@hey.com>"]
 version = "0.1.0"
 
 [deps]
@@ -9,6 +9,9 @@ CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 PProf = "e4faabce-9ead-11e9-39d9-4379958e3056"
 Pandas = "eadc2687-ae89-51f9-a5d9-86b5a6373a9c"
@@ -17,6 +20,13 @@ Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Seaborn = "d2ef9438-c967-53ab-8060-373fdd9e13eb"
+Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
+
+[compat]
+HDF5 = "0.17.2"
+IJulia = "1.25.0"
+JSON3 = "1.14.0"
+Serialization = "1.11.0"
