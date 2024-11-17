@@ -12,8 +12,8 @@ export animate
 include("util.jl")
 include("settings.jl")
 include("simulation.jl")
-include("search.jl")
 include("world.jl")
+include("search.jl")
 include("walker.jl")
 include("setup.jl")
 include("measure.jl")
@@ -45,6 +45,10 @@ include("visualize.jl")
     hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK, numWalkers=1, gridType=Paths.HEX_WORLD, X=10, Y=10, numLocations=2))
     Paths.update!(hexgrid)
     @test grid isa Paths.Simulation
+
+    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, gridType=Paths.HEX_WORLD, X=10, Y=10, numLocations=2))
+    Paths.update!(directsearch)
+    @test directsearch isa Paths.Simulation
 end
 
 

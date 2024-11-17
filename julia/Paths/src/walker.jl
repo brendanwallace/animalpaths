@@ -34,10 +34,12 @@ function gradientAt(position::Position, world::World)::Position
     x, y = Int.(floor.(position))
     gX = 0.0
     gY = 0.0
-    sobelX = [[-1, 0, 1],
+    sobelX = [
+        [-1, 0, 1],
         [-2, 0, 2],
         [-1, 0, 1]]
-    sobelY = [[-1, -2, -1],
+    sobelY = [
+        [-1, -2, -1],
         [0, 0, 0],
         [1, 2, 1]]
     for dx in [-1, 0, 1]
@@ -71,11 +73,6 @@ function update!(walker::GradientWalker)
 
     cw = walker.simulation.settings.comfortWeight
     step = normalize(cw .* comfortDirection .+ (1.0 - cw) .* targetDirection) .* WALKER_SPEED
-
-    # println("walker.position", walker.position)
-    # println("comfortDirection", comfortDirection)
-    # println("targetDirection", targetDirection)
-    # println("step", step)
 
     # take a step
     walker.position = walker.position .+ step
@@ -159,26 +156,26 @@ function update!(walker::SearchWalker)
 end
 
 
-# mutable struct DirectWalker <: Walker
-#     simulation::Simulation
-#     target::Union{Location,Nothing}
-#     position::Tuple{Float64,Float64}
-# end
+mutable struct DirectWalker <: Walker
+    simulation::Simulation
+    target::Union{Location,Nothing}
+    position::Tuple{Float64,Float64}
+end
 
 
-# function update!(walker::DirectWalker)
-#     if walker.target isa Nothing
-#         walker.target = rand(walker.simulation.locations)
-#     end
-#     arrived = norm(walker.position - walker.target.position) <= ARRIVAL_DISTANCE
-#     if arrived
-#         walker.target = rand(walker.simulation.locations)
-#     else
-#         direction = normalize(walker.target.position - walker.position)
-#         walker.position += direction * WALKER_SPEED
-#         improvePatch!(walker.simulation.world, walker.position)
-#     end
-# end
+function update!(walker::DirectWalker)
+    if walker.target isa Nothing
+        newtarget!(walker)
+    end
+    arrived = norm(walker.position .- walker.target.position) <= ARRIVAL_DISTANCE
+    if arrived
+        newtarget!(walker)
+    else
+        direction = normalize(walker.target.position .- walker.position)
+        walker.position = walker.position .+ (direction .* WALKER_SPEED)
+        improvePatch!(walker.simulation.world, roundtogrid(walker.position), 1.0)
+    end
+end
 
 """
 GridWalker plans a discrete path through the grid, considering only
@@ -194,47 +191,16 @@ mutable struct GridWalker <: Walker
     GridWalker(simulation, target, position) = new(simulation, target, position, [])
 end
 
-"""
-hexneighbors returns the 6 neighbors of a hex position.
-
-Odd rows are shifted forward, so they're connected to their upper-right and lower-right diagonal neighbors.
-Even rows are shifted backward, so they're connected to their upper-left and lower-left diagonal neighbors.
-"""
-function hexneighbors(position::GridPosition)::Array{GridPosition}
-    x, y = position
-    neighbors = hexneighbors(x, y, 1)
-    # neighbors::Array{Tuple{Integer,Integer}} = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-    # if mod(x, 2) == 1 # odd rows
-    #     push!(neighbors, (x + 1, y + 1))
-    #     push!(neighbors, (x + 1, y - 1))
-    # else # even rows
-    #     push!(neighbors, (x - 1, y + 1))
-    #     push!(neighbors, (x - 1, y - 1))
-    # end
-    @assert length(neighbors) == 6
-    return neighbors
-end
-
-function squareneighbors(position::GridPosition)::Array{GridPosition}
-    x, y = position
-    return [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-end
-
 
 """
 Needs to use A-star search.
 """
 function newpath!(walker::GridWalker)
-    world = walker.simulation.world
-    if walker.simulation.settings.gridType == HEX_WORLD
-        neighbors = (cp) -> [(p, costAt(world, p)) for p in hexneighbors(cp)]
-    elseif walker.simulation.settings.gridType == SQUARE_WORLD
-        neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
-    end
-    heuristic = (p) -> norm(p .- roundtogrid(walker.target.position))
 
-    gridPath::Array{GridPosition}, _cost::Float64 = astar(
-        roundtogrid(walker.position), roundtogrid(walker.target.position), neighbors, heuristic)
+    gridPath::Array{GridPosition}, _ = gridSearch(
+        walker.position, walker.target.position,
+        walker.simulation.world, walker.simulation.settings.searchStrategy)
+
     walker.path = [Float64.(p) for p in gridPath]
 end
 

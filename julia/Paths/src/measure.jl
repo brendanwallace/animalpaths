@@ -1,11 +1,6 @@
 import Base.@kwdef
 
-using JSON3
-using Dates
-using Serialization
-
-const FPS = 30
-
+const FULLY_IMPROVED_THRESHOLD = 0.99
 
 """
 Measures features of the network at a snapshot in time.
@@ -14,10 +9,12 @@ struct Snapshot
     averageTravelCost::Float64
     averageTravelLength::Float64
     totalImprovement::Float64
+    # How much improvement, counting squares at >=0.99 as 1.0, and others as 0.0.
+    thresholdImprovement::Float64
     # How many improvement steps have happened in the simulation.
     steps::Integer
     # The actual network. TBD on how to measure angles or anything like that.
-    paths::Array{Path}
+    # paths::Array{Path}
     # Weighted histogram of path headings (relative to going straight towards the target)
     # weightedHeadings::Array{Tuple{Float64,Float64}}
     # patches::Array{Float64}
@@ -54,8 +51,28 @@ end
 end
 
 
-function totalImprovement(sim::Simulation)::Float64
-    return sum(sim.world.patches)
+function totalImprovement(patches::Array{Float64})::Float64
+    return sum(patches)
+end
+
+"""
+Counts up patches that are improved to at least a specified threshold. 
+"""
+function thresholdImprovement(patches)::Float64
+    return sum(map(x ->
+            if x >= FULLY_IMPROVED_THRESHOLD
+                1.0
+            else
+                0.0
+            end, patches))
+end
+
+
+@testitem "Test for thresholdImprovement" begin
+    using Paths, Test
+
+    @test Paths.thresholdImprovement([1.001]) == 1.0
+    @test Paths.thresholdImprovement([0.98, 0.99, 0.991]) == 2.0
 end
 
 function weightedHeadings(path::Path)::Array{Tuple{Float64,Float64}}
@@ -108,8 +125,8 @@ function snapshot(sim::Paths.Simulation)::Snapshot
         for j in i+1:length(sim.locations)
             #println(sim.locations[i], sim.locations[j])
             n += 1
-            p, cost = Paths.shortestPathKanaiSuzuki(
-                sim.locations[i].position, sim.locations[j].position, Paths.costs(sim.world))
+            p, cost = Paths.shortestPath(
+                sim.locations[i].position, sim.locations[j].position, sim.world, sim.settings)
             totalCost += cost
             totalLength += pathLength(p)
             push!(paths, p)
@@ -121,87 +138,26 @@ function snapshot(sim::Paths.Simulation)::Snapshot
     return Snapshot(
         totalCost / n,
         totalLength / n,
-        totalImprovement(sim),
+        totalImprovement(sim.world.patches),
+        thresholdImprovement(sim.world.patches),
         sim.steps,
-        paths,
+        # paths,
         # deepcopy(sim.world.patches)
     )
 end
 
+@testitem "snapshot sanity checks" begin
+    # Test defaults
+    using Test, Paths
+    sim = Paths.MakeSimulation(Paths.Settings(numWalkers=1, X=10, Y=10, numLocations=2))
+    @test Paths.snapshot(sim) isa Paths.Snapshot
 
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK, numWalkers=1, X=10, Y=10, numLocations=2))
+    @test Paths.snapshot(grid) isa Paths.Snapshot
 
-"""
-This is the main method for running a bunch of simulations and measuring
-costs and saving them to json.
-"""
-function runSeries(;
-    F=400,
-    upf=100,
-    maxCosts=[1.5, 2.0, 4.0, 8.0],
-    patchLogics=[LINEAR, LOGISTIC, SATURATING],
-    improvementRatios=[50, 75, 100, 150, 200],
-    PRS=[0.0001, 0.0002, 0.0004],
-    searchStrategy=KANAI_SUZUKI,)
-    #::Array{SimulationResult}
-    FOLDER = "data/series|$(searchStrategy)|$(patchLogics)|$(today())"
-    datafile = "$(FOLDER)/data.json"
-    mkpath("$(FOLDER)/animations")
+    hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK, numWalkers=1, gridType=Paths.HEX_WORLD, X=10, Y=10, numLocations=2))
+    @test Paths.snapshot(hexgrid) isa Paths.Snapshot
 
-    @info "saving data to $(datafile)"
-
-    simulationResults::Array{SimulationResult} = []
-
-    for maxCost ∈ maxCosts
-        for pR ∈ PRS
-            for improvementRatio ∈ improvementRatios
-                for patchLogic ∈ patchLogics
-                    pI = pR * improvementRatio
-
-                    animfile = "$(FOLDER)/animations/$(patchLogic)|pI$(pI)|pR$(pR)|maxCost$(maxCost).gif"
-
-                    settings = Settings(
-                        maxCost=maxCost,
-                        scenario=RANDOM_FIXED,
-                        searchStrategy=searchStrategy,
-                        patchImprovement=pI,
-                        patchRecovery=pR,
-                        improvementLogic=patchLogic,
-                        recoveryLogic=patchLogic,
-                    )
-
-                    simulationResult = SimulationResult(settings)
-                    push!(simulationResults, simulationResult)
-
-                    sim::Simulation = Paths.MakeSimulation(settings)
-                    push!(simulationResult.snapshots, snapshot(sim))
-
-                    anim = @animate for f ∈ 1:F
-                        print("\r$(patchLogic) $(maxCost) $(pI) $(pR) $(f)/$(F)")
-
-                        for _ ∈ 1:upf
-                            update!(sim)
-                        end
-                        push!(simulationResult.snapshots, snapshot(sim))
-                        viz(sim)
-                        # if (pI == 0.01 && pR >= 0.0008) && f > 50
-                        #     break
-                        # end
-                    end
-
-                    println()
-                    gif(anim, animfile, fps=FPS)
-
-                    # This writes out the intermediate data every run (I think).
-                    serialize(datafile, simulationResults)
-                    open(datafile, "w") do io
-                        JSON3.write(io, simulationResults)
-                    end
-                end
-            end
-        end
-    end
-    # return simulationResults
-    open(datafile, "w") do io
-        JSON3.write(io, simulationResults)
-    end
+    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, gridType=Paths.HEX_WORLD, X=10, Y=10, numLocations=2))
+    @test Paths.snapshot(directsearch) isa Paths.Snapshot
 end

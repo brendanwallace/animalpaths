@@ -40,6 +40,10 @@ Trails form through:
 	* this explains why paths tend to touch obstacles
 
 pR vs pI controls how much trail can form//how minimal the network is. more vs less damped.
+below a threshold, no path forms.
+then, minimal networks.
+then, at a certain point, no deviation from direct paths.
+=> can think about laying down path vs path erosion and solve for an amount of length
 
 shortcutting angle determined by cost ratio. controls angles in the network.
 cos^-1(cost_path/cost_ground)

@@ -22,6 +22,8 @@ function randomWalkers(settings::Settings, simulation::Simulation)::Array{Walker
         w = GradientWalker
     elseif settings.searchStrategy == GRID_WALK
         w = GridWalker
+    elseif settings.searchStrategy == DIRECT_SEARCH
+        w = DirectWalker
     else
         throw("unhandled search strategy in function randomWalkers(): $(settings.searchStrategy)")
     end

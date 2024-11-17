@@ -59,6 +59,14 @@ function costAt(world::AbstractWorld, p::GridPosition)::Float64
     return costAt(world, x, y)
 end
 
+# """
+# Allows for raw access, so needs to check X, Y bounds.
+# """
+# function costAt(costs::Array{Float64}, p::GridPosition)::Float64
+#     x, y = p
+#     return costs[x, y]
+# end
+
 
 function costs(world::AbstractWorld)::Array{Float64}
     return world.settings.maxCost .* (1.0 .- world.patches) .+ (1.0 .* world.patches)

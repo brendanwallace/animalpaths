@@ -514,3 +514,75 @@ end
     @test c ≈ 6.0
 
 end
+
+"""
+hexneighbors returns the 6 neighbors of a hex position.
+
+Odd rows are shifted forward, so they're connected to their upper-right and lower-right diagonal neighbors.
+Even rows are shifted backward, so they're connected to their upper-left and lower-left diagonal neighbors.
+"""
+function hexneighbors(position::GridPosition)::Array{GridPosition}
+    x, y = position
+    neighbors = hexneighbors(x, y, 1)
+    # neighbors::Array{Tuple{Integer,Integer}} = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    # if mod(x, 2) == 1 # odd rows
+    #     push!(neighbors, (x + 1, y + 1))
+    #     push!(neighbors, (x + 1, y - 1))
+    # else # even rows
+    #     push!(neighbors, (x - 1, y + 1))
+    #     push!(neighbors, (x - 1, y - 1))
+    # end
+    @assert length(neighbors) == 6
+    return neighbors
+end
+
+function squareneighbors(position::GridPosition)::Array{GridPosition}
+    x, y = position
+    return [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+end
+
+
+function gridSearch(
+    source::Position, target::Position, world::World, searchStrategy::SearchStrategy)::Tuple{Path,Float64}
+    # if we're walking on a constrained grid, search should reflect it
+    if searchStrategy == GRID_WALK_HEX
+        neighbors = (cp) -> [(p, costAt(world, p)) for p in hexneighbors(cp)]
+    elseif searchStrategy == GRID_WALK_NEUMANN
+        neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
+    elseif searchStrategy == GRID_WALK_MOORE
+        throw("not implemented")
+    elseif searchStrategy == GRID_WALK_HEX_PLUS
+        throw("not implemented")
+    else
+        throw("search strategy not recognized as a grid search $(searchStrategy)")
+    end
+
+    heuristic = (p) -> norm(p .- roundtogrid(target))
+
+    gridPath::Array{GridPosition}, cost = astar(
+        roundtogrid(source), roundtogrid(target), neighbors, heuristic)
+    path = [Float64.(p) for p in gridPath]
+    return (path, cost)
+
+end
+
+
+
+
+"""
+Routes to the appropriate search algorithm given `settings`
+"""
+function shortestPath(
+    source::Position, target::Position, world::World, settings::Settings)::Tuple{Path,Float64}
+
+    if settings.searchStrategy ∈ [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER]
+        # use exact search for these. 
+        return shortestPathKanaiSuzuki(source, target, costs(world))
+    elseif settings.searchStrategy ∈ [GRID_WALK_NEUMANN, GRID_WALK_HEX, GRID_WALK_HEX_PLUS, GRID_WALK_MOORE]
+
+        return gridSearch(source, target, costs(world), settings.searchStrategy)
+
+    else
+        throw("no shortest path method found for $(settings.searchStrategy)")
+    end
+end
