@@ -420,8 +420,8 @@ end
 Main exported function of this file. Implements the any-directional search algorithm.
 """
 function shortestPathKanaiSuzuki(
-    source::Position, target::Position, costs::Matrix{Float64}, deltaThreshold=0.01,
-    steinerPoints::Int64=2)::Tuple{Path,Float64}
+    source::Position, target::Position, costs::Matrix{Float64}; deltaThreshold=0.01,
+    numSteinerPoints::Int64=3)::Tuple{Path,Float64}
     # TODO – switch these to rounding instead of flooring.
     # TODO – check to make sure these are inbounds?
     source = floor.(source)
@@ -432,7 +432,7 @@ function shortestPathKanaiSuzuki(
     nodesByPosition = Dict{Paths.Position,Node}(source => Node(source), target => Node(target))
     visitedFaces = Set{Paths.Face}()
     initialNeighbors = (node) -> (
-        Paths.populateNeighbors!(node, nodesByPosition, visitedFaces, costs, steinerPoints);
+        Paths.populateNeighbors!(node, nodesByPosition, visitedFaces, costs, numSteinerPoints);
         return [(e.node, e.cost) for e in node.neighbors])
     heuristic = n -> norm(n.position .- target)
 
@@ -461,7 +461,7 @@ function shortestPathKanaiSuzuki(
         # Step 2 - construct G_{n+1}
         # Add steiner points
         @debug "adding steiner points"
-        divideOriginalEdges!(nodesByPosition, steinerPoints)
+        divideOriginalEdges!(nodesByPosition, numSteinerPoints)
 
         @debug "connecting edges"
         connectAcrossFaces!(nodesByPosition, costs)
@@ -486,9 +486,9 @@ end
 
     p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (3.0, 3.0), zeros(Float64, (10, 10)) .+ 1)
     @test length(p) == 3
-    p, c = Paths.shortestPathKanaiSuzuki((3.0, 3.0), (1.0, 1.0), zeros(Float64, (10, 10)) .+ 1, 1)
+    p, c = Paths.shortestPathKanaiSuzuki((3.0, 3.0), (1.0, 1.0), zeros(Float64, (10, 10)) .+ 1, numSteinerPoints=1)
     @test length(p) == 3
-    p, c = Paths.shortestPathKanaiSuzuki((10.0, 10.0), (1.0, 1.0), zeros(Float64, (10, 10)) .+ 1, 1)
+    p, c = Paths.shortestPathKanaiSuzuki((10.0, 10.0), (1.0, 1.0), zeros(Float64, (10, 10)) .+ 1, numSteinerPoints=1)
     @test length(p) == 10
 
     # These are broken because search goes from vertex to vertex only.
@@ -499,11 +499,12 @@ end
 
     δ = 0.01
     tolerance = 0.1
-    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)) .+ 1, δ, 2)
+    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)) .+ 1,
+        deltaThreshold=δ, numSteinerPoints=2)
     @test c ≈ norm((9, 9))
-    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)) .+ 5, δ, 2)
+    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)) .+ 5, deltaThreshold=δ, numSteinerPoints=2)
     @test c ≈ 5 * norm((9, 9))
-    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (4.0, 5.0), zeros(Float64, (10, 10)) .+ 5, δ, 2)
+    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (4.0, 5.0), zeros(Float64, (10, 10)) .+ 5, deltaThreshold=δ, numSteinerPoints=2)
     @test c - 5 * 5 < tolerance
     p, c = Paths.shortestPathKanaiSuzuki((2.0, 2.0), (5.0, 5.0),
         [1.0 1.0 1.0 1.0 1.0;
@@ -541,6 +542,22 @@ function squareneighbors(position::GridPosition)::Array{GridPosition}
     return [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
 end
 
+"""
+Returns an array of the neighbors of `position` and the costs to get there.
+
+This assumes you can move in 12 directions. 6 in the normal hex-neighborhood directions,
+and 6 more along the edges between the immediate neighbors.
+
+
+"""
+function hex_plus_neighbors_costs(position:GridPosition, world::World)::Array{Tuple{GridPosition,Float64}}
+
+    return []
+end
+
+
+
+
 
 function gridSearch(
     source::Position, target::Position, world::World, searchStrategy::SearchStrategy)::Tuple{Path,Float64}
@@ -550,7 +567,7 @@ function gridSearch(
     elseif searchStrategy == GRID_WALK_NEUMANN
         neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
     elseif searchStrategy == GRID_WALK_MOORE
-        throw("not implemented")
+        neighbors = (cp) -> [(p, costAt(world, p)) for p in mooreneighbors(cp)]
     elseif searchStrategy == GRID_WALK_HEX_PLUS
         throw("not implemented")
     else
@@ -576,11 +593,11 @@ function shortestPath(
     source::Position, target::Position, world::World, settings::Settings)::Tuple{Path,Float64}
 
     if settings.searchStrategy ∈ [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER]
-        # use exact search for these. 
-        return shortestPathKanaiSuzuki(source, target, costs(world))
+        # use exact search for these.
+        return shortestPathKanaiSuzuki(source, target, costs(world), numSteinerPoints=settings.numSteinerPoints)
     elseif settings.searchStrategy ∈ [GRID_WALK_NEUMANN, GRID_WALK_HEX, GRID_WALK_HEX_PLUS, GRID_WALK_MOORE]
 
-        return gridSearch(source, target, costs(world), settings.searchStrategy)
+        return gridSearch(source, target, world, settings.searchStrategy)
 
     else
         throw("no shortest path method found for $(settings.searchStrategy)")

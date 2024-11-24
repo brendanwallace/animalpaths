@@ -20,7 +20,7 @@ function randomWalkers(settings::Settings, simulation::Simulation)::Array{Walker
         w = SearchWalker
     elseif settings.searchStrategy == GRADIENT_WALKER
         w = GradientWalker
-    elseif settings.searchStrategy == GRID_WALK
+    elseif settings.searchStrategy ∈ GRIDWALKS
         w = GridWalker
     elseif settings.searchStrategy == DIRECT_SEARCH
         w = DirectWalker
@@ -42,8 +42,12 @@ function MakeSimulation(settings::Settings)::Simulation
     sim.walkers = randomWalkers(settings, sim)
     if settings.scenario == RANDOM_FIXED
         sim.locations = randomLocations(settings)
-    else
+    elseif settings.scenario == RANDOM_DYNAMIC
         sim.locations = []
+    elseif settings.scenario == TRIANGLE
+        sim.locations = [Location((5.0, 5.0)), Location((20.0, 5.0)), Location((35.0, 5.0 + sqrt(3) * 15.0))]
+    else
+        throw("unhandled scenario $(settings.scenario)")
     end
     sim.steps = 0
     return sim

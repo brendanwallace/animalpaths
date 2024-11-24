@@ -15,16 +15,21 @@ This is the main method for running a bunch of simulations and measuring
 costs and saving them to json.
 """
 function main()
+    if length(ARGS) < 1
+        throw("supply a name for this series by running `julia $(PROGRAM_FILE) [series name]`")
+    else
+        seriesName = ARGS[1]
+    end
 
-    F = 500
+    F = 400
     upf = 100
-    maxCosts = [2.0, 10.0]
-    patchLogics = [Paths.LOGISTIC]
-    improvementRatios = [25, 50, 75]
-    PRs = [0.002]
-    COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5)
-    searchStrategies = [Paths.DIRECT_SEARCH]
-    FOLDER = "data/series/series|$(today())|F=$(F)|searchAlgorithms2"
+    maxCosts = [10.0, 2.0]
+    patchLogics = [Paths.LINEAR]
+    improvementRatios = [75, 50, 25]
+    PRs = [0.002, 0.0002]
+    COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
+    searchStrategies = [Paths.KANAI_SUZUKI]
+    FOLDER = "data/series/series|$(seriesName)|$(today())"
     datafile = "$(FOLDER)/data.json"
     mkpath("$(FOLDER)/animations")
 
@@ -36,11 +41,13 @@ function main()
     i = 1
     totalI = length(maxCosts) * length(PRs) * length(improvementRatios) * length(patchLogics) * length(searchStrategies)
 
-    for searchStrategy ∈ searchStrategies
-        for maxCost ∈ maxCosts
-            comfort = COMFORTS[maxCost]
-            for pR ∈ PRs
-                for ratio ∈ improvementRatios
+    for maxCost ∈ maxCosts
+        for ratio ∈ improvementRatios
+            for searchStrategy ∈ searchStrategies
+                # if searchStrategy == Paths.GRADIENT_WALKER
+                # comfort = COMFORTS[maxCost]
+                # end
+                for pR ∈ PRs
                     for patchLogic ∈ patchLogics
                         pI = pR * ratio
 
@@ -56,7 +63,8 @@ function main()
                             patchRecovery=pR,
                             improvementLogic=patchLogic,
                             recoveryLogic=patchLogic,
-                            comfortWeight=comfort,
+                            numSteinerPoints=2,
+                            # comfortWeight=comfort,
                         )
 
                         simulationResult = Paths.SimulationResult(settings)
@@ -68,7 +76,7 @@ function main()
                         anim = @animate for f ∈ 1:F
                             print("\r$(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
 
-                            for _ ∈ 1:upf
+                            for u ∈ 1:upf
                                 Paths.update!(sim)
                             end
                             push!(simulationResult.snapshots, Paths.snapshot(sim))

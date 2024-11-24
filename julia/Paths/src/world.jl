@@ -123,7 +123,7 @@ function improvePatch!(world::World, gridPosition::GridPosition, weight)
     r = world.settings.diffusionRadius
     x, y = gridPosition
     # _improvePatch!(world, x, y, weight*world.simulation.patchImprovement)
-    if world.settings.gridType == SQUARE_WORLD
+    if world.settings.searchStrategy ∈ SQUARE_WORLD_STRATEGIES
         for dx in -r:r
             for dy in -r:r
                 _x, _y = x + dx, y + dy
@@ -134,7 +134,7 @@ function improvePatch!(world::World, gridPosition::GridPosition, weight)
                 end
             end
         end
-    elseif world.settings.gridType == HEX_WORLD
+    elseif world.settings.searchStrategy ∈ HEX_WORLD_STRATEGIES
         for r in 0:world.settings.diffusionRadius
             for (_x, _y) in hexneighbors(x, y, r)
                 if _x >= 1 && _x <= world.settings.X && _y >= 1 && _y <= world.settings.Y
@@ -147,6 +147,6 @@ function improvePatch!(world::World, gridPosition::GridPosition, weight)
         # TODO - consider implementing diffusion on the hex world.
         # _improvePatch!(world, x, y, weight * world.settings.patchImprovement)
     else
-        throw("unknown grid type $(world.settings.gridType)")
+        throw("unknown grid type $(world.settings.searchStrategy)")
     end
 end

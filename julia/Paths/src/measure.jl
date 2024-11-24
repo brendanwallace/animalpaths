@@ -14,9 +14,11 @@ struct Snapshot
     # How many improvement steps have happened in the simulation.
     steps::Integer
     # The actual network. TBD on how to measure angles or anything like that.
-    # paths::Array{Path}
+    paths::Array{Path}
     # Weighted histogram of path headings (relative to going straight towards the target)
-    # weightedHeadings::Array{Tuple{Float64,Float64}}
+    weightedHeadings::Array{Tuple{Float64,Float64}}
+    avgHeading::Float64
+    avgSquareHeading::Float64
     # patches::Array{Float64}
     # anglesHistogram # Not sure what the type of this is.
 end
@@ -75,14 +77,14 @@ end
     @test Paths.thresholdImprovement([0.98, 0.99, 0.991]) == 2.0
 end
 
-function weightedHeadings(path::Path)::Array{Tuple{Float64,Float64}}
+function weightedHeadingsRelative(path::Path)::Array{Tuple{Float64,Float64}}
     headings = Array{Tuple{Float64,Float64}}(undef, length(path) - 1)
     target = path[length(path)]
+    targetStep = target .- path[i]
+    targetAngle = atan(targetStep[2], targetStep[1]) / π
     for i in 1:length(path)-1
         step = path[i+1] .- path[i]
         stepAngle = atan(step[2], step[1]) / π
-        targetStep = target .- path[i]
-        targetAngle = atan(targetStep[2], targetStep[1]) / π
         # angle of 0.25 above and 0.25 below should count the same
         differenceAngle = abs(stepAngle - targetAngle)
         # there may be a better way to accomplish this but I'm not sure
@@ -95,28 +97,81 @@ end
 @testitem "Test headings histogram" begin
     using Paths, Test
 
-    @test Paths.weightedHeadings([(0.0, 0.0), (1.0, 0.0)]) == [(0.0, 1.0)]
-    @test Paths.weightedHeadings([(0.0, 0.0), (0.0, 1.0)]) == [(0.0, 1.0)]
+    @test Paths.weightedHeadingsRelative([(0.0, 0.0), (1.0, 0.0)]) == [(0.0, 1.0)]
+    @test Paths.weightedHeadingsRelative([(0.0, 0.0), (0.0, 1.0)]) == [(0.0, 1.0)]
 
     # looks like this:
     #      e
     #      |
     #   s--
     #  distance 1 in direction π/2, then 1 in direction 0
-    @test Paths.weightedHeadings([(0.0, 0.0), (0.0, 1.0), (1.0, 1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
+    @test Paths.weightedHeadingsRelative([(0.0, 0.0), (0.0, 1.0), (1.0, 1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
     # Same as above, but going in the negative direction
-    @test Paths.weightedHeadings([(0.0, 0.0), (0.0, -1.0), (-1.0, -1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
+    @test Paths.weightedHeadingsRelative([(0.0, 0.0), (0.0, -1.0), (-1.0, -1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
     # Same as above, but going in the x direction
-    @test Paths.weightedHeadings([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
+    @test Paths.weightedHeadingsRelative([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
 
-    @test Paths.weightedHeadings([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
+    @test Paths.weightedHeadingsRelative([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]) == [(1 / 4, 1.0), (0, 1.0)]
 end
 
+function weightedHeadings(path::Paths.Path)::Array{Tuple{Float64,Float64}}
+    headings = Array{Tuple{Float64,Float64}}(undef, length(path) - 1)
+    target = path[length(path)]
+    targetStep = target .- path[1]
+    targetAngle = atan(targetStep[2], targetStep[1]) # between -1pi and 1pi
+    for i in 1:length(path)-1
+        step = path[i+1] .- path[i]
+        stepAngle = atan(step[2], step[1]) # between -1pi and 1pi
+        differenceAngle = min(abs(stepAngle - targetAngle), abs(stepAngle + targetAngle))
+        headings[i] = (differenceAngle, norm(step))
+    end
+    return headings
+end
+
+function allWeightedHeadings(paths::Array{Path})::Array{Tuple{Float64,Float64}}
+    return reduce(vcat, [weightedHeadings(path) for path in paths])
+end
+
+
+function firstMoment(valWeightPairs::Array{Tuple{Float64,Float64}})::Float64
+    totalVal, totalWeight = 0.0, 0.0
+    for (val, weight) ∈ valWeightPairs
+        totalVal += val * weight
+        totalWeight += weight
+    end
+    return totalVal / totalWeight
+end
+
+@testitem "test firstMoment" begin
+    using Paths, Test
+    @test Paths.firstMoment([(1.0, 100.0)]) == 1.0
+    @test Paths.firstMoment([(100.0, 1.0)]) == 100.0
+    @test Paths.firstMoment([(10.0, 1.0), (0.0, 1.0)]) == 5.0
+    @test Paths.firstMoment([(1.0, 5.0), (0.0, 5.0)]) == 0.5
+end
+
+function secondMoment(valWeightPairs::Array{Tuple{Float64,Float64}})::Float64
+    totalVal, totalWeight = 0.0, 0.0
+    for (val, weight) ∈ valWeightPairs
+        totalVal += val * val * weight
+        totalWeight += weight
+    end
+    return totalVal / totalWeight
+end
+
+
+@testitem "test secondMoment" begin
+    using Paths, Test
+    @test Paths.secondMoment([(1.0, 100.0)]) == 1.0
+    @test Paths.secondMoment([(100.0, 1.0)]) == 10000.0
+    @test Paths.secondMoment([(10.0, 1.0), (0.0, 1.0)]) == 50.0
+    @test Paths.secondMoment([(1.0, 5.0), (0.0, 5.0)]) == 0.5
+end
 # function anglesInPath(path::Path)::
 
 
 
-function snapshot(sim::Paths.Simulation)::Snapshot
+function snapshot(sim::Paths.Simulation; savepaths=false, saveheadings=false)::Snapshot
     n = 0.0
     totalCost = 0.0
     totalLength = 0.0
@@ -133,7 +188,17 @@ function snapshot(sim::Paths.Simulation)::Snapshot
         end
     end
 
-    # weightedHeadings = weightedHeadings(paths)
+    weightedHeadings = allWeightedHeadings(paths)
+    avgHeading = firstMoment(weightedHeadings)
+    avgSquareHeading = secondMoment(weightedHeadings)
+
+    if !savepaths
+        paths = []
+    end
+    if !saveheadings
+        weightedHeadings = []
+    end
+
 
     return Snapshot(
         totalCost / n,
@@ -141,7 +206,10 @@ function snapshot(sim::Paths.Simulation)::Snapshot
         totalImprovement(sim.world.patches),
         thresholdImprovement(sim.world.patches),
         sim.steps,
-        # paths,
+        paths,
+        weightedHeadings,
+        avgHeading,
+        avgSquareHeading,
         # deepcopy(sim.world.patches)
     )
 end
@@ -152,12 +220,12 @@ end
     sim = Paths.MakeSimulation(Paths.Settings(numWalkers=1, X=10, Y=10, numLocations=2))
     @test Paths.snapshot(sim) isa Paths.Snapshot
 
-    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK, numWalkers=1, X=10, Y=10, numLocations=2))
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
     @test Paths.snapshot(grid) isa Paths.Snapshot
 
-    hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK, numWalkers=1, gridType=Paths.HEX_WORLD, X=10, Y=10, numLocations=2))
+    hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
     @test Paths.snapshot(hexgrid) isa Paths.Snapshot
 
-    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, gridType=Paths.HEX_WORLD, X=10, Y=10, numLocations=2))
+    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, X=10, Y=10, numLocations=2))
     @test Paths.snapshot(directsearch) isa Paths.Snapshot
 end

@@ -4,6 +4,7 @@ import Base.@kwdef
 @enum Scenario begin
     RANDOM_FIXED = 1
     RANDOM_DYNAMIC = 2
+    TRIANGLE = 3
 end
 
 
@@ -34,6 +35,11 @@ HEX_WORLD neighborhoods.
     GRID_WALK_HEX_PLUS = 7
 end
 
+# These all sets of strategies that share a lot of logic.
+const GRIDWALKS = [GRID_WALK_NEUMANN, GRID_WALK_MOORE, GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
+const SQUARE_WORLD_STRATEGIES = [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER, GRID_WALK_NEUMANN, GRID_WALK_MOORE]
+const HEX_WORLD_STRATEGIES = [GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
+
 # """
 # Controls whether the world is a square grid or a hexagon grid.
 # """
@@ -55,6 +61,9 @@ end
     # WALKER SETTINGS
     maxCost::Float64 = 2.0
     searchStrategy::SearchStrategy = KANAI_SUZUKI
+
+    # Only applies to the KANAI_SUZUKI algorithm
+    numSteinerPoints::Int64 = 3
     # analog to maxCost, used for GRADIENT_WALKER search strategy only
     comfortWeight::Float64 = 0.5
 

@@ -3,13 +3,15 @@ const WALKER_SPEED = 1.0
 
 
 """
-This should probably stay the same for all the walker types.
+Assigns a walker a new target, to be called after a walker arrives.
 
-Call this only once a walker has arrived at a target and needs a new one.
+This should stay the same for all the walker types.
+
+As this grows, it can maybe turn into more of a dispatch to other functions.
 """
 function newtarget!(walker::Walker)
     scenario::Scenario = walker.simulation.settings.scenario
-    if scenario == RANDOM_FIXED
+    if scenario ∈ [RANDOM_FIXED, TRIANGLE]
         walker.target = rand(walker.simulation.locations)
     elseif scenario == RANDOM_DYNAMIC
         prevTarget = walker.target
@@ -203,6 +205,7 @@ function newpath!(walker::GridWalker)
 
     walker.path = [Float64.(p) for p in gridPath]
 end
+
 
 """
 TODO – why does this not work if the paths are out-of-bounds?
