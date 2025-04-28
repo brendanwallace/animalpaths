@@ -24,6 +24,8 @@ function randomWalkers(settings::Settings, simulation::Simulation)::Array{Walker
         w = GridWalker
     elseif settings.searchStrategy == DIRECT_SEARCH
         w = DirectWalker
+    elseif settings.searchStrategy == HEURISTIC_WALK
+        w = HeuristicWalker
     else
         throw("unhandled search strategy in function randomWalkers(): $(settings.searchStrategy)")
     end
@@ -33,13 +35,19 @@ end
 
 
 function MakeSimulation(settings::Settings)::Simulation
-    # This should guarantee the same starting locations and walker positions.
-    Random.seed!(settings.randomSeed)
+
 
     sim = Simulation()
     sim.settings = settings
     sim.world = World(settings)
+
+    # Setup walkers
+    # This should guarantee the same starting locations and walker positions.
+    Random.seed!(settings.randomSeedWalkers)
     sim.walkers = randomWalkers(settings, sim)
+
+    # Setup locations
+    Random.seed!(settings.randomSeedLocations)
     if settings.scenario == RANDOM_FIXED
         sim.locations = randomLocations(settings)
     elseif settings.scenario == RANDOM_DYNAMIC

@@ -33,11 +33,12 @@ HEX_WORLD neighborhoods.
     GRID_WALK_MOORE = 5
     GRID_WALK_HEX = 6
     GRID_WALK_HEX_PLUS = 7
+    HEURISTIC_WALK = 8
 end
 
 # These all sets of strategies that share a lot of logic.
 const GRIDWALKS = [GRID_WALK_NEUMANN, GRID_WALK_MOORE, GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
-const SQUARE_WORLD_STRATEGIES = [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER, GRID_WALK_NEUMANN, GRID_WALK_MOORE]
+const SQUARE_WORLD_STRATEGIES = [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER, GRID_WALK_NEUMANN, GRID_WALK_MOORE, HEURISTIC_WALK]
 const HEX_WORLD_STRATEGIES = [GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
 
 # """
@@ -48,12 +49,18 @@ const HEX_WORLD_STRATEGIES = [GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
 #     HEX_WORLD = 2
 # end
 
+@enum BoundaryConditions begin
+    SOLID = 1
+    PERIODIC = 2
+end
+
 
 # General settings object.
 @kwdef mutable struct Settings
     X::Integer = 100
     Y::Integer = 100
-    randomSeed::Integer = 1
+    randomSeedWalkers::Integer = 1
+    randomSeedLocations::Integer = 1
     numWalkers::Integer = 10
     numLocations::Integer = 10
     scenario::Scenario = RANDOM_FIXED
@@ -75,4 +82,5 @@ const HEX_WORLD_STRATEGIES = [GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
     diffusionGaussianVariance::Float64 = 1.0
     improvementLogic::PatchLogic = LOGISTIC
     recoveryLogic::PatchLogic = LOGISTIC
+    boundaryConditions::BoundaryConditions = SOLID
 end

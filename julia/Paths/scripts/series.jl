@@ -8,6 +8,12 @@ import Paths
 
 const FPS = 30
 
+"""
+Used for talk:
+    numLocations = 10
+    improvementRatios = [75, 50, 25]
+    PRs = [0.002, 0.0002]
+"""
 
 
 """
@@ -71,7 +77,7 @@ function main()
                         push!(simulationResults, simulationResult)
 
                         sim::Paths.Simulation = Paths.MakeSimulation(settings)
-                        push!(simulationResult.snapshots, Paths.snapshot(sim))
+                        push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
 
                         anim = @animate for f ∈ 1:F
                             print("\r$(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
@@ -79,7 +85,7 @@ function main()
                             for u ∈ 1:upf
                                 Paths.update!(sim)
                             end
-                            push!(simulationResult.snapshots, Paths.snapshot(sim))
+                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
                             Paths.viz(sim)
                             # if (pI == 0.01 && pR >= 0.0008) && f > 50
                             #     break

@@ -13,8 +13,8 @@ include("util.jl")
 include("settings.jl")
 include("simulation.jl")
 include("world.jl")
-include("search.jl")
-include("walker.jl")
+include("search/search.jl")
+include("walker/walker.jl")
 include("setup.jl")
 include("measure.jl")
 include("visualize.jl")
@@ -37,6 +37,12 @@ include("visualize.jl")
     Paths.update!(sim)
     @test sim isa Paths.Simulation
 
+    # with periodic boundaries
+    sim = Paths.MakeSimulation(Paths.Settings(numWalkers=1, X=10, Y=10, numLocations=2, boundaryConditions=Paths.PERIODIC))
+    @test sim isa Paths.Simulation
+    Paths.update!(sim)
+    @test sim isa Paths.Simulation
+
     grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
     @test grid isa Paths.Simulation
@@ -48,6 +54,10 @@ include("visualize.jl")
     directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(directsearch)
     @test directsearch isa Paths.Simulation
+
+    heuristicsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.HEURISTIC_WALK, numWalkers=1, X=10, Y=10, numLocations=2))
+    Paths.update!(heuristicsearch)
+    @test heuristicsearch isa Paths.Simulation
 end
 
 

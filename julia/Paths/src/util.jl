@@ -68,3 +68,47 @@ end
     @test Paths.hexneighbors(2, 2, 1) == [(3, 2), (1, 2), (2, 3), (2, 1), (1, 3), (1, 1)]
     @test Paths.hexneighbors(1, 2, 1) == [(2, 2), (0, 2), (1, 3), (1, 1), (0, 3), (0, 1)]
 end
+
+
+function rotate(vector, angle)
+    rotation_matrix = [
+        cos(angle) -sin(angle);
+        sin(angle) cos(angle)]
+    rotated = rotation_matrix * [vector[1]; vector[2]]
+    return (rotated[1], rotated[2])
+end
+
+
+@testitem "test periodic norm" begin
+    using Test, Paths
+    @test Paths.periodicNorm([0, 1], [0, 2], 10, 10) == 1
+    # wraps the y coordinate around
+    @test Paths.periodicNorm([0, 1], [0, 9], 10, 10) == 2
+    # wraps the x coordinate around
+    @test Paths.periodicNorm([1, 0], [9, 0], 10, 10) == 2
+    # wraps around the corner
+    @test Paths.periodicNorm([1, 1], [10, 10], 10, 10) ≈ sqrt(2)
+end
+
+
+"""
+Julia indexes by 1, so we have to adjust mods like this.
+"""
+function jmod(num::Number, base)
+    return 1 + mod(num - 1, base)
+end
+
+function jmod(nums::Tuple{Number,Number}, bases::Tuple{Number,Number})
+    x, y = nums
+    X, Y = bases
+    return (jmod(x, X), jmod(y, Y))
+end
+
+
+@testitem "test jmod" begin
+    using Test, Paths
+    @test Paths.jmod(10, 10) == 10
+    @test Paths.jmod(3.5, 10) == 3.5
+    @test Paths.jmod(9.9, 10) == 9.9
+    @test Paths.jmod(0.5, 10) == 10.5
+end
