@@ -1,4 +1,12 @@
-# Abstract:
+---
+title:  |
+  | cost-explicit active walker model
+  | or 
+  | emergent transportation networks 
+geometry: margin=2cm
+---
+
+
 
 ## Describes the larger problem
 

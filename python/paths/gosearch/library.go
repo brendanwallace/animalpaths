@@ -57,7 +57,7 @@ func (w world) at(x, y int) float64 {
    return w.patches[w.width*y+x]
 }
 
-// INPORT EXPORT STUFF
+// IMPORT EXPORT STUFF
 
 //export Search
 func Search(worldPtr *float64, height, width int, startX, startY, endX, endY float64,
