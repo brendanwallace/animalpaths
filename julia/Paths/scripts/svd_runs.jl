@@ -9,10 +9,18 @@ import Paths
 const FPS = 30
 
 """
-Used for SVD runs:
+Used for original SVD runs:
     numLocations = 10
     improvementRatios = [75]
     PRs = [0.002, 0.0002]
+
+
+Used for 4/29/25 SVD runs on Sayak:
+    numLocations = 10
+    improvementRatios = [75, 50, 25]
+    PRs = [0.002, 0.0002]
+
+This is what we used for the talk.
 """
 
 
@@ -32,7 +40,7 @@ function main()
     upf = 100
     maxCosts = [2.0]
     patchLogics = [Paths.LINEAR]
-    improvementRatios = [75]
+    improvementRatios = [75, 50, 25]
     PRs = [0.002, 0.0002]
     COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
