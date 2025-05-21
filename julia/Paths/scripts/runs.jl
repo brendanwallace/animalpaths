@@ -36,6 +36,7 @@ function main()
     end
 
     NUM_REPLICAS = 10
+    NUM_LOCATION_CONFIGURATIONS = 1
     F = 100
     upf = 100
     maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
@@ -69,47 +70,49 @@ function main()
 
 
 
+                        for locationSeed ∈ 1:NUM_LOCATION_CONFIGURATIONS
 
 
+                            for replica ∈ 1:NUM_REPLICAS
 
-                        for replica ∈ 1:NUM_REPLICAS
+                               	settings = Paths.Settings(
+                                    maxCost=maxCost,
+                                    scenario=Paths.RANDOM_FIXED,
+                                    searchStrategy=searchStrategy,
+                                    patchImprovement=pI,
+                                    patchRecovery=pR,
+                                    improvementLogic=patchLogic,
+                                    recoveryLogic=patchLogic,
+                                    numSteinerPoints=2,
+                                    randomSeedWalkers=replica,
+                                    randomSeedLocations=locationSeed,
+                                    # comfortWeight=comfort,
+                                )
 
-                           	settings = Paths.Settings(
-                                maxCost=maxCost,
-                                scenario=Paths.RANDOM_FIXED,
-                                searchStrategy=searchStrategy,
-                                patchImprovement=pI,
-                                patchRecovery=pR,
-                                improvementLogic=patchLogic,
-                                recoveryLogic=patchLogic,
-                                numSteinerPoints=2,
-                                randomSeedWalkers=replica,
-                                # comfortWeight=comfort,
-                            )
+    	                        simulationResult = Paths.SimulationResult(settings)
+    	                        push!(simulationResults, simulationResult)
 
-	                        simulationResult = Paths.SimulationResult(settings)
-	                        push!(simulationResults, simulationResult)
+    	                        sim::Paths.Simulation = Paths.MakeSimulation(settings)
+    	                        push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
 
-	                        sim::Paths.Simulation = Paths.MakeSimulation(settings)
-	                        push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
+    	                        for f ∈ 1:F
+    	                            print("\r$(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
 
-	                        for f ∈ 1:F
-	                            print("\r$(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
-
-	                            for u ∈ 1:upf
-	                                Paths.update!(sim)
-	                            end
-	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
-	                        end
+    	                            for u ∈ 1:upf
+    	                                Paths.update!(sim)
+    	                            end
+    	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
+    	                        end
 
 
-	                        # This writes out the intermediate data every run (I think).
-	                        serialize(datafile, simulationResults)
-	                        open(datafile, "w") do io
-	                            JSON3.write(io, simulationResults)
-	                        end
-	                        i += 1
-	                    end
+    	                        # This writes out the intermediate data every run (I think).
+    	                        serialize(datafile, simulationResults)
+    	                        open(datafile, "w") do io
+    	                            JSON3.write(io, simulationResults)
+    	                        end
+    	                        i += 1
+    	                    end
+                        end
                     end
                 end
             end
