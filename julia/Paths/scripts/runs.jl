@@ -35,7 +35,7 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 10
+    NUM_REPLICAS = 1
     NUM_LOCATION_CONFIGURATIONS = 1
     F = 100
     upf = 100
@@ -48,6 +48,13 @@ function main()
     FOLDER = "data/series/$(seriesName)|$(today())"
     datafile = "$(FOLDER)/data.json"
     mkpath("$(FOLDER)/animations")
+
+    # What data to save
+
+    SHORTEST_PATHS = true
+    SAVE_PATHS = true
+    SAVE_HEADINGS = true
+    SAVE_PATCHES = true
 
     disable_logging(Logging.Info)
     println("saving data to $(datafile)")
@@ -101,7 +108,12 @@ function main()
     	                            for u ∈ 1:upf
     	                                Paths.update!(sim)
     	                            end
-    	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
+    	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
+                                        shortestpaths=SHORTEST_PATHS,
+                                        savepaths=SAVE_PATHS,
+                                        saveheadings=SAVE_HEADINGS,
+                                        savepatches=SAVE_PATCHES,
+                                    ))
     	                        end
 
 
