@@ -1,3 +1,10 @@
+----
+title: Paper outline
+date: November 1, 2024
+updated: May 13, 2025
+----
+
+
 # Emergent Transportation Networks
 
 ## Intro
@@ -76,21 +83,28 @@ conclusions:
 - [guessing this] higher cost <-> less path allocated -> prefer less infrastructure//innovation is slower
 
 
-### III. Model Comparison. Compare
+### III. Internal Geometry vs Cost
+
+#### 1. Angle should depend on cost. (figure A)
+
+#### 2. How we measure angles in the network (figure B)
+
+#### 3. Explain results (figure C)
+
+
+
+## Other Stuff
+
+### IV. Other Scenarios, including Random <-> Random Fractals
+
+### V. Model Comparison. Compare
 
 descriptive breakdown of the differences here
 
 [Pareto curve plot of all the different models]
 
 
-### IV. Random <-> Random Fractals
 
-[explore random<->random with different max costs, on different size worlds]
-
-
-## Applications/Discussions
-
-### 
 
 
 
