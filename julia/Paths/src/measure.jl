@@ -213,8 +213,8 @@ function takeSnapshot(sim::Paths.Simulation;
             end
         end
 
-        s.averageTravelCost = totalCost / n
-        s.averageTravelLength = totalLength / n
+        snapshot.averageTravelCost = totalCost / n
+        snapshot.averageTravelLength = totalLength / n
 
 
         if savepaths
