@@ -51,15 +51,15 @@ function main()
     end
 
     NUM_REPLICAS = 8
-    NUM_LOCATION_CONFIGURATIONS = 4
+    NUM_LOCATION_CONFIGURATIONS = 2
     F = 100
     upf = 100
-    maxCosts = [2.0, 8.0]
+    maxCosts = [8.0, 2.0]
     patchLogics = [Paths.LINEAR]
     improvementRatios = [50, 100]
-    PRs = [0.002, 0.0002]
+    PRs = [0.0002, 0.002]
     boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
-    numLocations = [10, 20]
+    numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
