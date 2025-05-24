@@ -20,7 +20,22 @@ Used for 4/29/25 SVD runs on Sayak:
 
 This is what we used for the talk.
 
+Angles analysis:
 
+    maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
+    improvementRatios = [75]
+    PRs = [0.002]
+
+
+Wide SVD
+
+    maxCosts = [2.0, 8.0]
+    improvementRatios = [50, 100]
+    PRs = [0.002, 0.0002]
+    boundaryConditions = [PERIODIC, SOLID]
+    numLocations = [10, 20]
+    NUM_LOCATION_CONFIGURATIONS = 4
+    NUM_REPLICAS = 8
 """
 
 
@@ -35,14 +50,16 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 1
-    NUM_LOCATION_CONFIGURATIONS = 1
+    NUM_REPLICAS = 8
+    NUM_LOCATION_CONFIGURATIONS = 4
     F = 100
     upf = 100
-    maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
+    maxCosts = [2.0, 8.0]
     patchLogics = [Paths.LINEAR]
-    improvementRatios = [75]
-    PRs = [0.002]
+    improvementRatios = [50, 100]
+    PRs = [0.002, 0.0002]
+    boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
+    numLocations = [10, 20]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
@@ -51,9 +68,9 @@ function main()
 
     # What data to save
 
-    SHORTEST_PATHS = true
-    SAVE_PATHS = true
-    SAVE_HEADINGS = true
+    SHORTEST_PATHS = false
+    SAVE_PATHS = false
+    SAVE_HEADINGS = false
     SAVE_PATCHES = true
 
     disable_logging(Logging.Info)
@@ -61,13 +78,13 @@ function main()
 
     simulationResults::Array{Paths.SimulationResult} = []
 
-    i = 1
-    totalI = (length(maxCosts) * length(PRs) * length(improvementRatios)
-    	* length(patchLogics) * length(searchStrategies) * NUM_REPLICAS)
+    i = 1 
+    totalI = (length(maxCosts) * length(PRs) * length(improvementRatios) * length(numLocations)
+    	* length(patchLogics) * length(boundaryConditions) * NUM_REPLICAS * NUM_LOCATION_CONFIGURATIONS)
 
     for maxCost ∈ maxCosts
         for ratio ∈ improvementRatios
-            for searchStrategy ∈ searchStrategies
+            for boundaryCondition ∈ boundaryConditions
                 # if searchStrategy == Paths.GRADIENT_WALKER
                 # comfort = COMFORTS[maxCost]
                 # end
@@ -75,7 +92,7 @@ function main()
                     for patchLogic ∈ patchLogics
                         pI = pR * ratio
 
-
+                        for nLocations ∈ numLocations
 
                         for locationSeed ∈ 1:NUM_LOCATION_CONFIGURATIONS
 
@@ -85,7 +102,7 @@ function main()
                                	settings = Paths.Settings(
                                     maxCost=maxCost,
                                     scenario=Paths.RANDOM_FIXED,
-                                    searchStrategy=searchStrategy,
+                                    # searchStrategy=searchStrategy,
                                     patchImprovement=pI,
                                     patchRecovery=pR,
                                     improvementLogic=patchLogic,
@@ -93,6 +110,8 @@ function main()
                                     numSteinerPoints=2,
                                     randomSeedWalkers=replica,
                                     randomSeedLocations=locationSeed,
+                                    boundaryConditions=boundaryCondition,
+                                    numLocations=nLocations,
                                     # comfortWeight=comfort,
                                 )
 
@@ -103,7 +122,7 @@ function main()
     	                        push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
 
     	                        for f ∈ 1:F
-    	                            print("\r$(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
+    	                            print("\r$(nLocations)/$(numLocations) $(boundaryCondition)/$(boundaryConditions) $(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
 
     	                            for u ∈ 1:upf
     	                                Paths.update!(sim)
@@ -126,6 +145,7 @@ function main()
     	                    end
                         end
                     end
+                end
                 end
             end
         end

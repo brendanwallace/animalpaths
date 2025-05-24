@@ -227,6 +227,7 @@ function takeSnapshot(sim::Paths.Simulation;
         end
     end
 
+    snapshot.totalImprovement = totalImprovement(sim.world.patches)
     snapshot.steps = sim.steps
 
     if savepatches
