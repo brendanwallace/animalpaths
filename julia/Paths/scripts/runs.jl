@@ -54,9 +54,9 @@ function main()
     NUM_LOCATION_CONFIGURATIONS = 2
     F = 100
     upf = 100
-    maxCosts = [8.0, 2.0]
+    maxCosts = [2.0]
     patchLogics = [Paths.LINEAR]
-    improvementRatios = [50, 100]
+    improvementRatios = [100]
     PRs = [0.0002, 0.002]
     boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
     numLocations = [20, 10]
