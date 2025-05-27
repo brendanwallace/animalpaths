@@ -50,15 +50,15 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 8
+    NUM_REPLICAS = 1
     NUM_LOCATION_CONFIGURATIONS = 2
     F = 100
     upf = 100
     maxCosts = [2.0]
-    patchLogics = [Paths.LINEAR]
     improvementRatios = [100]
-    PRs = [0.0002, 0.002]
+    PRs = [0.002, 0.02]
     boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
+    patchLogics = [Paths.SATURATING, Paths.LOGISTIC]
     numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
@@ -112,6 +112,7 @@ function main()
                                     randomSeedLocations=locationSeed,
                                     boundaryConditions=boundaryCondition,
                                     numLocations=nLocations,
+                                    patchLogic=patchLogic,
                                     # comfortWeight=comfort,
                                 )
 
@@ -127,12 +128,23 @@ function main()
     	                            for u ∈ 1:upf
     	                                Paths.update!(sim)
     	                            end
-    	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
-                                        shortestpaths=SHORTEST_PATHS,
-                                        savepaths=SAVE_PATHS,
-                                        saveheadings=SAVE_HEADINGS,
-                                        savepatches=SAVE_PATCHES,
-                                    ))
+
+                                    # We should always save all the information for the final snapshot.
+                                    if f == F:
+                                        push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
+                                            shortestpaths=true,
+                                            savepaths=true,
+                                            saveheadings=true,
+                                            savepatches=true,
+                                        ))
+                                    else:
+        	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
+                                            shortestpaths=SHORTEST_PATHS,
+                                            savepaths=SAVE_PATHS,
+                                            saveheadings=SAVE_HEADINGS,
+                                            savepatches=SAVE_PATCHES,
+                                        ))
+                                    end
     	                        end
 
 

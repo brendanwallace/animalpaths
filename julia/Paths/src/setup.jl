@@ -41,11 +41,6 @@ function MakeSimulation(settings::Settings)::Simulation
     sim.settings = settings
     sim.world = World(settings)
 
-    # Setup walkers
-    # This should guarantee the same starting locations and walker positions.
-    Random.seed!(settings.randomSeedWalkers)
-    sim.walkers = randomWalkers(settings, sim)
-
     # Setup locations
     Random.seed!(settings.randomSeedLocations)
     if settings.scenario == RANDOM_FIXED
@@ -57,6 +52,15 @@ function MakeSimulation(settings::Settings)::Simulation
     else
         throw("unhandled scenario $(settings.scenario)")
     end
+
+
+    # Setup walkers
+    # This should guarantee the same starting locations, walker positions, and
+    # initial targets.
+    Random.seed!(settings.randomSeedWalkers)
+    sim.walkers = randomWalkers(settings, sim)
+
+
     sim.steps = 0
     return sim
 end
