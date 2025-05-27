@@ -50,14 +50,14 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 1
+    NUM_REPLICAS = 8
     NUM_LOCATION_CONFIGURATIONS = 2
     F = 100
     upf = 100
     maxCosts = [2.0]
     improvementRatios = [100]
-    PRs = [0.002, 0.02]
-    boundaryConditions = [Paths.SOLID] #[Paths.PERIODIC, Paths.SOLID]
+    PRs = [0.002]
+    boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
     patchLogics = [Paths.SATURATING, Paths.LOGISTIC]
     numLocations = [10] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)

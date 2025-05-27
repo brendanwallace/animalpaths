@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 def load_data(datafile):
     # load the json, and normalize into a dataframe
@@ -15,6 +16,8 @@ def load_data(datafile):
                                    ["settings", "numLocations"],
                                    ["settings", "randomSeedWalkers"],
                                    ["settings", "randomSeedLocations"],
+                                   ["settings", "recoveryLogic"],
+                                   ["settings", "improvementLogic"],
                                 ])
 
     df["ratio"] = df["settings.patchImprovement"] / df["settings.patchRecovery"]
@@ -28,6 +31,7 @@ def load_data(datafile):
     print("num locations:", df["settings.numLocations"].unique())
     print("random walker seeds:", len(df["settings.randomSeedWalkers"].unique()))
     print("random locations seeds:", len(df["settings.randomSeedLocations"].unique()))
+    print("patch recovery logic:", df["settings.recoveryLogic"].unique())
 
     return df
 
