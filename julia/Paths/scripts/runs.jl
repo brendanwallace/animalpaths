@@ -130,14 +130,14 @@ function main()
     	                            end
 
                                     # We should always save all the information for the final snapshot.
-                                    if f == F:
+                                    if f == F
                                         push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
                                             shortestpaths=true,
                                             savepaths=true,
                                             saveheadings=true,
                                             savepatches=true,
                                         ))
-                                    else:
+                                    else
         	                            push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
                                             shortestpaths=SHORTEST_PATHS,
                                             savepaths=SAVE_PATHS,
