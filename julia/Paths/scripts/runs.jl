@@ -112,7 +112,6 @@ function main()
                                     randomSeedLocations=locationSeed,
                                     boundaryConditions=boundaryCondition,
                                     numLocations=nLocations,
-                                    patchLogic=patchLogic,
                                     # comfortWeight=comfort,
                                 )
 
