@@ -52,11 +52,11 @@ function main()
     end
 
     NUM_REPLICAS = 8
-    LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
+    LOCATION_CONFIGURATIONS = [1, 2]
     F = 50
     upf = 100
     maxCosts = [2.0]
-    improvementRatios = 25:5:200
+    improvementRatios = 50:10:200
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
