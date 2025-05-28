@@ -51,8 +51,8 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 1
-    LOCATION_CONFIGURATIONS = [1]
+    NUM_REPLICAS = 8
+    LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
     F = 50
     upf = 100
     maxCosts = [2.0]
