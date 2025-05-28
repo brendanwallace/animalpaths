@@ -59,7 +59,7 @@ function main()
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
-    numLocations = [10, 20] # numLocations = [20, 10]
+    numLocations = [10] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
@@ -73,7 +73,9 @@ function main()
     SAVE_HEADINGS = true
     SAVE_PATCHES = true
 
-    disable_logging(Logging.Info)
+    debug_logger = ConsoleLogger(stderr, Logging.Debug);
+    global_logger(debug_logger);
+    # disable_logging(Logging.Info)
     println("saving data to $(datafile)")
 
     simulationResults::Array{Paths.SimulationResult} = []
