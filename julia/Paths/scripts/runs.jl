@@ -56,10 +56,10 @@ function main()
     upf = 100
     maxCosts = [2.0]
     improvementRatios = [100]
-    PRs = [0.002]
+    PRs = [0.001]
     boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
-    patchLogics = [Paths.SATURATING, Paths.LOGISTIC]
-    numLocations = [10] # numLocations = [20, 10]
+    patchLogics = [Paths.LINEAR]
+    numLocations = [10, 20] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"

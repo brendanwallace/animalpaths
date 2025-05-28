@@ -24,6 +24,10 @@ def load_data(datafile):
     # hopefully won't be necessary forever
     # df["run_id"] = [i // 201 for i in range(df.shape[0])]
 
+
+    return df
+
+def describe(df):
     print("ratios:", df["ratio"].unique())
     print("patch recovery:", df["settings.patchRecovery"].unique())
     print("max costs:", df["settings.maxCost"].unique())
@@ -32,8 +36,6 @@ def load_data(datafile):
     print("random walker seeds:", len(df["settings.randomSeedWalkers"].unique()))
     print("random locations seeds:", len(df["settings.randomSeedLocations"].unique()))
     print("patch recovery logic:", df["settings.recoveryLogic"].unique())
-
-    return df
 
 
 def plot_patches(df, MAX_IMAGES=32):
