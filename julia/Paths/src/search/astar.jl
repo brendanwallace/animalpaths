@@ -29,7 +29,7 @@ function astar(start::T, goal::T, neighbors::Function, h::Function)::Tuple{Array
         # Pop the cheapest element.
         current = dequeue!(pq)
         push!(visited, current)
-        if debug_prints @info "current: $(current)" end
+        # if debug_prints @info "current: $(current)" end
         # If we arrived at the target, use cameFrom to unroll the path.
         if current == goal
             # if debug_prints
@@ -38,9 +38,9 @@ function astar(start::T, goal::T, neighbors::Function, h::Function)::Tuple{Array
             path::Array{T} = [current]
             cost::Float64 = bestCost[goal]
             while current != start
-                if debug_prints
-                    @info "$(current), $(start)"
-                end
+                # if debug_prints
+                #     @info "$(current), $(start)"
+                # end
                 if haskey(cameFrom, current)
                     current = cameFrom[current]
                     push!(path, current)
