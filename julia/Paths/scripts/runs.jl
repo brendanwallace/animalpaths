@@ -51,16 +51,16 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 16
-    NUM_LOCATION_CONFIGURATIONS = 4
+    NUM_REPLICAS = 1
+    LOCATION_CONFIGURATIONS = [1]
     F = 50
     upf = 100
-    maxCosts = [2.0, 5.0, 9.0]
-    improvementRatios = [100]
+    maxCosts = [2.0]
+    improvementRatios = 50:5:150
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
-    numLocations = [10, 20] # numLocations = [20, 10]
+    numLocations = [10] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
@@ -83,7 +83,7 @@ function main()
 
     i = 1
     totalI = (length(maxCosts) * length(PRs) * length(improvementRatios) * length(numLocations)
-              * length(patchLogics) * length(boundaryConditions) * NUM_REPLICAS * NUM_LOCATION_CONFIGURATIONS)
+              * length(patchLogics) * length(boundaryConditions) * NUM_REPLICAS * length(LOCATION_CONFIGURATIONS))
 
     for maxCost ∈ maxCosts
         for ratio ∈ improvementRatios
@@ -97,7 +97,7 @@ function main()
 
                         for nLocations ∈ numLocations
 
-                            for locationSeed ∈ 1:NUM_LOCATION_CONFIGURATIONS
+                            for locationSeed ∈ LOCATION_CONFIGURATIONS
 
 
                                 for replica ∈ 1:NUM_REPLICAS
