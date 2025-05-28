@@ -7,19 +7,40 @@ function astar(start::T, goal::T, neighbors::Function, h::Function)::Tuple{Array
     bestCost = DefaultDict{T,Float64}(Inf)
     pq = PriorityQueue{T,Float64}()
     cameFrom = Dict{T,T}()
+    visited = Set{T}()
 
     bestCost[start] = 0.0
     pq[start] = h(start)
 
+    # debug_prints = (start.position == (91.0, 20.0)) && (goal.position == (70.0, 63.0))
+    # debug_prints = (start.position == (8.0, 35.0)) && (goal.position == (57.0, 45.0))
+
+
+    # if debug_prints
+    #     @info "debug this run"
+    #     @info "$(pq)"
+    #     @info "$(start)"
+    #     @info "$(goal)"
+    # end
+
     # pop the top element and add its neighbors
     while !isempty(pq)
+        
         # Pop the cheapest element.
         current = dequeue!(pq)
+        push!(visited, current)
+        if debug_prints @info "current: $(current)" end
         # If we arrived at the target, use cameFrom to unroll the path.
         if current == goal
+            # if debug_prints
+            #     @info "current == goal"
+            # end
             path::Array{T} = [current]
             cost::Float64 = bestCost[goal]
             while current != start
+                if debug_prints
+                    @info "$(current), $(start)"
+                end
                 if haskey(cameFrom, current)
                     current = cameFrom[current]
                     push!(path, current)
@@ -34,10 +55,12 @@ function astar(start::T, goal::T, neighbors::Function, h::Function)::Tuple{Array
         end
 
         # Only add neighbors to the queue if this path to them is cheaper than
-        # what we've already got in the queue.
+        # what we've already got in the queue, and we haven't visited them.
         for (neighbor, cost) in neighbors(current)
+            # if debug_prints @info "neighbor: $(neighbor), cost: $(cost)" end
+
             tentativeCost = bestCost[current] + cost
-            if tentativeCost < bestCost[neighbor]
+            if tentativeCost < bestCost[neighbor] && !(neighbor in visited)
                 bestCost[neighbor] = tentativeCost
                 pq[neighbor] = tentativeCost + h(neighbor)
                 cameFrom[neighbor] = current

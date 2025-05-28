@@ -370,7 +370,7 @@ function shortestPathKanaiSuzuki(
     source = floor.(source)
     target = floor.(target)
 
-    # @info "searching from $(source) to $(target)"
+    @info "searching from $(source) to $(target)"
 
     nodesByPosition = Dict{Paths.Position,Node}(source => Node(source), target => Node(target))
     visitedFaces = Set{Paths.Face}()
@@ -415,13 +415,13 @@ function shortestPathKanaiSuzuki(
 
         # Step 2 - construct G_{n+1}
         # Add steiner points
-        # @info "adding steiner points"
+        @info "adding steiner points"
         divideOriginalEdges!(nodesByPosition, numSteinerPoints, bc, X, Y)
 
-        # @info "connecting edges"
+        @info "connecting edges"
         connectAcrossFaces!(nodesByPosition, costs)
 
-        # @info "step $(i) – searching over $(length(nodesByPosition)) nodesByPosition"
+        @info "step $(i) – searching over $(length(nodesByPosition)) nodesByPosition"
         # Step 3 - a-star G_n
         neighbors = (n) -> [(e.node, e.cost) for e in n.neighbors]
         # h = n->norm(n.position .- nodesByPosition[target].position)
@@ -434,12 +434,12 @@ function shortestPathKanaiSuzuki(
     end
 
     # @info "returning path of cost $(pathCost), $([p.position for p in path])"
-    # for p in path
-    #     @debug "$(p.position)"
-    #     # for e in p.neighbors
-    #     #     @debug "      $(e)"
-    #     # end
-    # end
+    for p in path
+        @debug "$(p.position)"
+        # for e in p.neighbors
+        #     @debug "      $(e)"
+        # end
+    end
 
     return ([n.position for n in path], pathCost)
 end
