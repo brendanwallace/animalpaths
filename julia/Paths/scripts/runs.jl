@@ -56,7 +56,7 @@ function main()
     F = 50
     upf = 100
     maxCosts = [2.0]
-    improvementRatios = 50:5:150
+    improvementRatios = 25:5:200
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
