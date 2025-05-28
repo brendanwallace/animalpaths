@@ -1,6 +1,8 @@
 const ARRIVAL_DISTANCE = 1.0
 const WALKER_SPEED = 1.0
 
+const SHORTCUT_FIRST_SEARCH = true
+
 
 """
 Assigns a walker a new target, to be called after a walker arrives.
@@ -97,6 +99,14 @@ end
 
 
 function newpath!(walker::SearchWalker)
+
+    if SHORTCUT_FIRST_SEARCH
+        if walker.simulation.steps == 0
+            walker.path = [walker.target.position]
+            return
+        end
+    end
+
     walker.path, _cost = shortestPathKanaiSuzuki(
         walker.position,
         walker.target.position,

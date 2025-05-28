@@ -51,16 +51,16 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 1
-    NUM_LOCATION_CONFIGURATIONS = 1
+    NUM_REPLICAS = 16
+    NUM_LOCATION_CONFIGURATIONS = 4
     F = 50
     upf = 100
-    maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0]
+    maxCosts = [2.0, 5.0, 9.0]
     improvementRatios = [100]
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
-    numLocations = [10] # numLocations = [20, 10]
+    numLocations = [10, 20] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
@@ -69,9 +69,9 @@ function main()
 
     # What data to save
 
-    SHORTEST_PATHS = true
-    SAVE_PATHS = true
-    SAVE_HEADINGS = true
+    SHORTEST_PATHS = false
+    SAVE_PATHS = false
+    SAVE_HEADINGS = false
     SAVE_PATCHES = true
 
     # debug_logger = ConsoleLogger(stderr, Logging.Debug);
@@ -148,14 +148,13 @@ function main()
                                             ))
                                         end
 
-                                        # This writes out the intermediate data every run (I think).
-                                        serialize(datafile, simulationResults)
-                                        open(datafile, "w") do io
-                                            JSON3.write(io, simulationResults)
-                                        end
                                     end
 
-
+                                    # This writes out the intermediate data every run (I think).
+                                    serialize(datafile, simulationResults)
+                                    open(datafile, "w") do io
+                                        JSON3.write(io, simulationResults)
+                                    end
                                     i += 1
                                 end
                             end
