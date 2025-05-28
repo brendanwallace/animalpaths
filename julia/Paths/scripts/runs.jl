@@ -64,7 +64,7 @@ function main()
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
     datafile = "$(FOLDER)/data.json"
-    # mkpath("$(FOLDER)/animations")
+    mkpath("$(FOLDER)")
 
     # What data to save
 
