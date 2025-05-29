@@ -45,8 +45,7 @@ costs and saving them to json.
 """
 function main()
     if length(ARGS) < 1
-        seriesName = "scratch"
-        # throw("supply a name for this series by running `julia $(PROGRAM_FILE) [series name]`")
+        throw("supply a name for this series by running `julia $(PROGRAM_FILE) [series name]`")
     else
         seriesName = ARGS[1]
     end
@@ -56,7 +55,7 @@ function main()
     F = 50
     upf = 100
     maxCosts = [2.0]
-    improvementRatios = 50:10:200
+    improvementRatios = 10:10:40
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
