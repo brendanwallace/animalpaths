@@ -25,22 +25,20 @@ function animate()
 
     settings = Paths.Settings(
         maxCost=maxCost,
-        comfortWeight=0.3,
         scenario=Paths.RANDOM_FIXED,
-        searchStrategy=Paths.KANAI_SUZUKI,
-        patchImprovement=patchImprovement,
-        patchRecovery=patchRecovery,
-        numSteinerPoints=1,
-        recoveryLogic=Paths.LINEAR,
-        improvementLogic=Paths.LINEAR,
-        numWalkers=10,
-        boundaryConditions=Paths.SOLID,
-        numLocations=15,
-        X=100,
-        Y=100,
-        # randomSeed=1,
-        # numLocations=15,
+        # searchStrategy=searchStrategy,
+        patchImprovement=pI,
+        patchRecovery=pR,
+        improvementLogic=patchLogic,
+        recoveryLogic=patchLogic,
+        numSteinerPoints=2,
+        randomSeedWalkers=replica,
+        randomSeedLocations=locationSeed,
+        boundaryConditions=boundaryCondition,
+        numLocations=nLocations,
+        # comfortWeight=comfort,
     )
+
 
     showwalkers = UPF <= 8
     showlocations = settings.scenario !== Paths.RANDOM_DYNAMIC

@@ -50,16 +50,16 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 8
-    LOCATION_CONFIGURATIONS = [1, 2]
+    NUM_REPLICAS = 128
+    LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
     F = 50
     upf = 100
     maxCosts = [2.0]
-    improvementRatios = 10:10:40
+    improvementRatios = [100]
     PRs = [0.001]
-    boundaryConditions = [Paths.SOLID]
+    boundaryConditions = [Paths.SOLID, Paths.PERIODIC]
     patchLogics = [Paths.LINEAR]
-    numLocations = [10] # numLocations = [20, 10]
+    numLocations = [10, 20] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
     searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"

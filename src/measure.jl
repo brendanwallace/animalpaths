@@ -20,6 +20,7 @@ Measures features of the network at a snapshot in time.
     avgHeading::Float64 = 0.0
     avgSquareHeading::Float64 = 0.0
     patches::Array{Float64} = []
+
     # anglesHistogram # Not sure what the type of this is.
 end
 

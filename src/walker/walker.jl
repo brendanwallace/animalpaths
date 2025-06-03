@@ -1,7 +1,7 @@
 const ARRIVAL_DISTANCE = 1.0
 const WALKER_SPEED = 1.0
 
-const SHORTCUT_FIRST_SEARCH = true
+const SHORTCUT_FIRST_SEARCH = false
 
 
 """
@@ -134,12 +134,17 @@ function update!(walker::SearchWalker)
             # TODO – could require that we actually hit a new target, and then we could keep walking.
             break
         end
+
+
         nextPosition = walker.path[1]
+        nextEdgeLength = norm(nextPosition .- walker.position)
+
+
+
         # This should be in the middle of the correct square.
         # TODO -- this should put more weight into the face which has lower cost if
         # we're walking right along an edge.
         improvePosition = (nextPosition .+ walker.position) ./ 2
-        nextEdgeLength = norm(nextPosition .- walker.position)
         facesToImprove = faces(improvePosition)
         if (traveled + nextEdgeLength) < WALKER_SPEED
             walker.position = nextPosition

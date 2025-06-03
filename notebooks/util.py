@@ -47,7 +47,8 @@ def plot_patches(df, MAX_IMAGES=32):
     fig, axs = plt.subplots(math.ceil(MAX_IMAGES / IM_PER_ROW), IM_PER_ROW)
     for i in range(MAX_IMAGES):
         ax = axs[i//IM_PER_ROW, i%IM_PER_ROW]
-        ax.imshow(np.reshape(df["patches"].iloc[i], (100, 100)))
+        ax.imshow(np.reshape(df["patches"].iloc[i], (100, 100)), cmap="inferno")
+        ax.axis('off')
     plt.show()
 
 def svd(df, plot=True):
@@ -74,7 +75,8 @@ def svd(df, plot=True):
         fig, axs = plt.subplots(2, 4)
         for i in range(8):
             ax = axs[i//4, i%4]
-            ax.imshow(np.reshape(Vh[i], (100, 100)))
-            ax.set_title(f"{i}:, {round(s[i], 3)}")
+            ax.imshow(np.reshape(Vh[i], (100, 100)), cmap="inferno")
+            ax.axis('off')
+            # ax.set_title(f"{i}:, {round(s[i], 3)}")
 
     return U, S, Vh
