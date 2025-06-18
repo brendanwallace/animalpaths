@@ -7,6 +7,16 @@ using Plots
 import Paths
 
 """
+6/18 SVD run
+    maxCosts = [2.0, 8.0]
+    improvementRatios = [100]
+    PRs = [0.001]
+    boundaryConditions = [PERIODIC, SOLID]
+    numLocations = [10, 20]
+    NUM_LOCATION_CONFIGURATIONS = 4
+    NUM_REPLICAS = 64
+
+
 Used for original SVD runs:
     numLocations = 10
     improvementRatios = [75]
@@ -50,7 +60,7 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 128
+    NUM_REPLICAS = 64
     LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
     F = 50
     upf = 100

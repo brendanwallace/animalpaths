@@ -1,7 +1,7 @@
 const ARRIVAL_DISTANCE = 1.0
 const WALKER_SPEED = 1.0
 
-const SHORTCUT_FIRST_SEARCH = false
+const SHORTCUT_FIRST_SEARCH = true
 
 
 """
@@ -100,9 +100,10 @@ end
 
 function newpath!(walker::SearchWalker)
 
-    if SHORTCUT_FIRST_SEARCH
+    if SHORTCUT_FIRST_SEARCH && walker.simulation.settings.boundaryConditions == SOLID
         if walker.simulation.steps == 0
             walker.path = [walker.target.position]
+            @info "setting walker path to $(walker.path) (coming from $(walker.position))"
             return
         end
     end
@@ -123,10 +124,10 @@ function update!(walker::SearchWalker)
         newpath!(walker)
     end
 
-    traveled = 0.0
-    while traveled < WALKER_SPEED
+    travelBudget = WALKER_SPEED
+    while travelBudget > 0
         if length(walker.path) == 0
-            @debug "walker ran out of path at $(walker.position) without arriving at $(walker.target.position)."
+            @info "walker ran out of path at $(walker.position) without arriving at $(walker.target.position)."
             prevTarget = walker.target
 
             newtarget!(walker)
@@ -135,41 +136,38 @@ function update!(walker::SearchWalker)
             break
         end
 
-
         nextPosition = walker.path[1]
-        nextEdgeLength = norm(nextPosition .- walker.position)
+        stepLength = norm(nextPosition .- walker.position)
+        if walker.simulation.settings.boundaryConditions == PERIODIC
+            stepLength = periodicNorm(nextPosition, walker.position,
+                walker.simulation.settings.X,
+                walker.simulation.settings.Y)
+        end
 
-
-
-        # This should be in the middle of the correct square.
-        # TODO -- this should put more weight into the face which has lower cost if
-        # we're walking right along an edge.
-        improvePosition = (nextPosition .+ walker.position) ./ 2
-        facesToImprove = faces(improvePosition)
-        if (traveled + nextEdgeLength) < WALKER_SPEED
-            walker.position = nextPosition
-            for face in facesToImprove
-                improvePatch!(
-                    walker.simulation.world,
-                    face,
-                    nextEdgeLength / length(facesToImprove),
-                )
-            end
-            traveled += nextEdgeLength
-            popfirst!(walker.path)
+        # @info "nextPosition: $(nextPosition), stepLength: $(stepLength), travelBudget: $(travelBudget)"
+        
+        # If this step would take us past our remaining travel budget, we want
+        # to use up the rest of the travel budget but not pop the next position
+        # from the path.
+        # If boundary conditions are PERIODIC, we just take the full-length step.
+        if stepLength > travelBudget && walker.simulation.settings.boundaryConditions == SOLID
+            nextPosition = walker.position .+ 
+                (travelBudget .* (nextPosition .- walker.position) ./ stepLength)
+            stepLength = travelBudget
+            travelBudget = 0.0
         else
-            distanceToTravel = WALKER_SPEED - traveled
-            walker.position =
-                walker.position .+
-                (distanceToTravel .* (nextPosition .- walker.position))
-            for face in facesToImprove
-                improvePatch!(
-                    walker.simulation.world,
-                    face,
-                    distanceToTravel / length(facesToImprove),
-                )
-            end
-            traveled = WALKER_SPEED
+            popfirst!(walker.path)
+            travelBudget -= stepLength
+        end
+
+        walker.position = nextPosition
+        facesToImprove = faces((nextPosition .+ walker.position) ./ 2)
+        for face in facesToImprove
+            improvePatch!(
+                walker.simulation.world,
+                face,
+                stepLength / length(facesToImprove),
+            )
         end
     end
 end

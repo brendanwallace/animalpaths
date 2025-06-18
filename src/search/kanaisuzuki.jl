@@ -388,6 +388,8 @@ function shortestPathKanaiSuzuki(
     else
         throw("unknown boundary condition $(bc)")
     end
+    
+
 
     # Step 1 - construct G0 with nodesByPosition and edges
     # @debug "constructing original graph"
