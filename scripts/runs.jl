@@ -7,6 +7,20 @@ using Plots
 import Paths
 
 """
+6/20 optimality run
+    NUM_REPLICAS = 8
+    LOCATION_CONFIGURATIONS = [1, 2]
+    F = 50
+    upf = 100
+    maxCosts = [2.0, 8.0]
+    improvementRatios = [
+        10.0, 20.0, 30.0, 40.0, 50.0, 60.0,
+        70.0, 80.0, 90.0, 100.0, 110.0, 120.0,
+        130.0, 140.0, 150.0, 160.0, 170.0, 180.0, 190.0, 200.0]
+    PRs = [0.001]
+    boundaryConditions = [Paths.SOLID]
+
+
 6/18 SVD run
     maxCosts = [2.0, 8.0]
     improvementRatios = [100]
@@ -60,14 +74,17 @@ function main()
         seriesName = ARGS[1]
     end
 
-    NUM_REPLICAS = 64
-    LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
+    NUM_REPLICAS = 8
+    LOCATION_CONFIGURATIONS = [1, 2]
     F = 50
     upf = 100
-    maxCosts = [2.0]
-    improvementRatios = [100]
+    maxCosts = [2.0, 8.0]
+    improvementRatios = [
+        10.0, 20.0, 30.0, 40.0, 50.0, 60.0,
+        70.0, 80.0, 90.0, 100.0, 110.0, 120.0,
+        130.0, 140.0, 150.0, 160.0, 170.0, 180.0, 190.0, 200.0]
     PRs = [0.001]
-    boundaryConditions = [Paths.SOLID, Paths.PERIODIC]
+    boundaryConditions = [Paths.SOLID]
     patchLogics = [Paths.LINEAR]
     numLocations = [10, 20] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
@@ -78,7 +95,7 @@ function main()
 
     # What data to save
 
-    SHORTEST_PATHS = false
+    SHORTEST_PATHS = true
     SAVE_PATHS = false
     SAVE_HEADINGS = false
     SAVE_PATCHES = true
