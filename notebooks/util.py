@@ -3,6 +3,8 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import seaborn as sns
+
 
 def load_data(datafile):
     # load the json, and normalize into a dataframe
@@ -36,6 +38,7 @@ def describe(df):
     print("random walker seeds:", len(df["settings.randomSeedWalkers"].unique()))
     print("random locations seeds:", len(df["settings.randomSeedLocations"].unique()))
     print("patch recovery logic:", df["settings.recoveryLogic"].unique())
+    print("steps:", df["steps"].max())
 
 
 def plot_patches(df, MAX_IMAGES=32):
@@ -51,25 +54,31 @@ def plot_patches(df, MAX_IMAGES=32):
         ax.axis('off')
     plt.show()
 
-def svd(df, plot=True):
+def svd(_all, steps, plot=True, demean=False, dynamics=True):
+
+    df = _all[_all["steps"] == steps]
+
     patches = df["patches"]
 
     num_observations = len(patches)
     num_features = len(patches.iloc[0])
     # observations as rows, features as columns
     A = np.reshape(patches.explode(), (num_observations, num_features)).astype(float)
-    # we actually *don't* want to demean A.
+
+    # we probably *don't* want to demean A.
     # they are already appropriately scaled and as centered as they need to be!
-    # A = A - np.mean(A, axis=0)
+    if demean:
+        A = A - np.mean(A, axis=0)
     U, S, Vh = np.linalg.svd(A, full_matrices=False)
 
     # svd weight
     N = len(df)
 
     if plot:
+        fig, axs = plt.subplots(2, 1)
         s = S**2/sum(S**2)
-        plt.bar([x for x in range(N)], s[:N])
-        plt.show()
+        axs[0].bar([x for x in range(N)], S[:N]),
+        axs[1].bar([x for x in range(N)], s[:N]),
         
         # plot the eigen-trails
         fig, axs = plt.subplots(2, 4)
@@ -77,6 +86,33 @@ def svd(df, plot=True):
             ax = axs[i//4, i%4]
             ax.imshow(np.reshape(Vh[i], (100, 100)), cmap="inferno")
             ax.axis('off')
-            # ax.set_title(f"{i}:, {round(s[i], 3)}")
+            ax.set_title(f"{round(s[i], 2)}, {round(S[i] / sum(S), 2)}")
+        plt.show()
+
+    if dynamics:
+        # scatter plot of the first & second components
+        plt.scatter(U[:, 1], U[:, 2])
+        plt.title("U1 vs U2")
+        plt.show()
+
+
+        # decompose the patches into their components vs the SVD and add it to
+        # the full dataframe
+        DIMENSIONS_TO_SHOW = 4
+
+        for i in range(DIMENSIONS_TO_SHOW):
+            _all[f"U{i}"] = _all["patches"].map(lambda p: p @ Vh.T[:, i])
+
+        fig, axs = plt.subplots(2, int(DIMENSIONS_TO_SHOW/2))
+
+        for i in range(DIMENSIONS_TO_SHOW):
+            sns.lineplot(data=_all[_all["steps"] >= 0], x="steps", y=f"U{i}", ax=axs[i//2, i%2],
+                     hue="settings.randomSeedWalkers", style="settings.boundaryConditions", legend=False)
+        plt.show()
+
+        sns.relplot(data=_all[_all["steps"] == steps], y="averageTravelCost",
+            hue="U1", x="totalImprovement", style="settings.boundaryConditions")
+        plt.show()
+
 
     return U, S, Vh

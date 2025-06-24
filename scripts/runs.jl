@@ -6,8 +6,46 @@ using Plots
 
 import Paths
 
+# Invariant.
+upf = 100
+patchLogics = [Paths.LINEAR]
+searchStrategies = [Paths.KANAI_SUZUKI]
+
+# What data to save.
+SHORTEST_PATHS = false
+SAVE_PATHS = false
+SAVE_HEADINGS = false
+SAVE_PATCHES = true
+
+
+# 6/24 SVD run
+seriesName = "SVD"
+F = 400
+maxCosts = [2.0]
+improvementRatios = [100]
+PRs = [0.001, 0.0005]
+boundaryConditions = [PERIODIC]
+numLocations = [10]
+NUM_REPLICAS = 64
+LOCATION_CONFIGURATIONS = [1]
+
+
 """
-6/20 optimality run
+
+6/23 SVD run
+    F = 200
+    upf = 100
+    maxCosts = [2.0]
+    improvementRatios = [100]
+    PRs = [0.001]
+    boundaryConditions = [PERIODIC, SOLID]
+    numLocations = [10, 20]
+    NUM_LOCATION_CONFIGURATIONS = 4
+    NUM_REPLICAS = 64
+
+6/20 optimality run.
+*****NOTE***** this ran all weekend and didn't finish by Tuesday.
+                was at ~ 200/1200
     NUM_REPLICAS = 8
     LOCATION_CONFIGURATIONS = [1, 2]
     F = 50
@@ -20,7 +58,6 @@ import Paths
     PRs = [0.001]
     boundaryConditions = [Paths.SOLID]
 
-
 6/18 SVD run
     maxCosts = [2.0, 8.0]
     improvementRatios = [100]
@@ -30,12 +67,10 @@ import Paths
     NUM_LOCATION_CONFIGURATIONS = 4
     NUM_REPLICAS = 64
 
-
 Used for original SVD runs:
     numLocations = 10
     improvementRatios = [75]
     PRs = [0.002, 0.0002]
-
 
 Used for 4/29/25 SVD runs on Sayak:
     numLocations = 10
@@ -49,7 +84,6 @@ Angles analysis:
     maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
     improvementRatios = [75]
     PRs = [0.002]
-
 
 Wide SVD
 
@@ -68,37 +102,18 @@ This is the main method for running a bunch of simulations and measuring
 costs and saving them to json.
 """
 function main()
-    if length(ARGS) < 1
-        throw("supply a name for this series by running `julia $(PROGRAM_FILE) [series name]`")
-    else
-        seriesName = ARGS[1]
-    end
+    # if length(ARGS) < 1
+    #     throw("supply a name for this series by running `julia $(PROGRAM_FILE) [series name]`")
+    # else
+    #     seriesName = ARGS[1]
+    # end
 
-    NUM_REPLICAS = 8
-    LOCATION_CONFIGURATIONS = [1, 2]
-    F = 50
-    upf = 100
-    maxCosts = [2.0, 8.0]
-    improvementRatios = [
-        10.0, 20.0, 30.0, 40.0, 50.0, 60.0,
-        70.0, 80.0, 90.0, 100.0, 110.0, 120.0,
-        130.0, 140.0, 150.0, 160.0, 170.0, 180.0, 190.0, 200.0]
-    PRs = [0.001]
-    boundaryConditions = [Paths.SOLID]
-    patchLogics = [Paths.LINEAR]
-    numLocations = [10, 20] # numLocations = [20, 10]
     # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
-    searchStrategies = [Paths.KANAI_SUZUKI]
     FOLDER = "data/series/$(seriesName)|$(today())"
     datafile = "$(FOLDER)/data.json"
     mkpath("$(FOLDER)")
 
-    # What data to save
 
-    SHORTEST_PATHS = true
-    SAVE_PATHS = false
-    SAVE_HEADINGS = false
-    SAVE_PATCHES = true
 
     # debug_logger = ConsoleLogger(stderr, Logging.Debug);
     # global_logger(debug_logger);
