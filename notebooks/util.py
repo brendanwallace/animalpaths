@@ -110,6 +110,8 @@ def svd(_all, steps, plot=True, demean=False, dynamics=True):
                      hue="settings.randomSeedWalkers", style="settings.boundaryConditions", legend=False)
         plt.show()
 
+        
+
         sns.relplot(data=_all[_all["steps"] == steps], y="averageTravelCost",
             hue="U1", x="totalImprovement", style="settings.boundaryConditions")
         plt.show()
