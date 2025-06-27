@@ -20,7 +20,7 @@ SAVE_PATCHES = true
 
 # 6/24 SVD run
 seriesName = "SVD"
-F = 200
+F = 400
 maxCosts = [2.0]
 improvementRatios = [100]
 PRs = [0.001]
