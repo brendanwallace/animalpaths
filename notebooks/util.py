@@ -90,11 +90,6 @@ def svd(_all, steps, plot=True, demean=False, dynamics=True):
         plt.show()
 
     if dynamics:
-        # scatter plot of the first & second components
-        plt.scatter(U[:, 1], U[:, 2])
-        plt.title("U1 vs U2")
-        plt.show()
-
 
         # decompose the patches into their components vs the SVD and add it to
         # the full dataframe
@@ -103,6 +98,12 @@ def svd(_all, steps, plot=True, demean=False, dynamics=True):
         for i in range(DIMENSIONS_TO_SHOW):
             _all[f"U{i}"] = _all["patches"].map(lambda p: p @ Vh.T[:, i])
 
+        # scatter plot of the first & second components
+        sns.scatterplot(data=_all[_all["steps"] == steps], x="U1", y="U2")
+        plt.show()
+        sns.scatterplot(data=_all[_all["steps"] >= (steps - 10000)], x="U1", y="U2")
+        plt.show()
+
         fig, axs = plt.subplots(2, int(DIMENSIONS_TO_SHOW/2))
 
         for i in range(DIMENSIONS_TO_SHOW):
@@ -110,7 +111,7 @@ def svd(_all, steps, plot=True, demean=False, dynamics=True):
                      hue="settings.randomSeedWalkers", style="settings.boundaryConditions", legend=False)
         plt.show()
 
-        
+
 
         sns.relplot(data=_all[_all["steps"] == steps], y="averageTravelCost",
             hue="U1", x="totalImprovement", style="settings.boundaryConditions")

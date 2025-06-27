@@ -20,14 +20,14 @@ SAVE_PATCHES = true
 
 # 6/24 SVD run
 seriesName = "SVD"
-F = 400
+F = 200
 maxCosts = [2.0]
 improvementRatios = [100]
-PRs = [0.001, 0.0005]
-boundaryConditions = [Paths.SOLID]
+PRs = [0.001]
+boundaryConditions = [Paths.Periodic, Paths.SOLID]
 numLocations = [10]
 NUM_REPLICAS = 64
-LOCATION_CONFIGURATIONS = [1]
+LOCATION_CONFIGURATIONS = [2, 3, 4]
 
 
 """
