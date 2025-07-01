@@ -12,24 +12,22 @@ patchLogics = [Paths.LINEAR]
 searchStrategies = [Paths.KANAI_SUZUKI]
 
 # What data to save.
-SHORTEST_PATHS = false
-SAVE_PATHS = false
-SAVE_HEADINGS = false
+SHORTEST_PATHS = true
+SAVE_PATHS = true
+SAVE_HEADINGS = true
 SAVE_PATCHES = true
 
 
 # 6/24 SVD run
-seriesName = "SVD"
-F = 400
-maxCosts = [2.0]
+seriesName = "cost-angles"
+F = 200
+maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
 improvementRatios = [100]
 PRs = [0.001]
-boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
-numLocations = [10]
-NUM_REPLICAS = 64
-LOCATION_CONFIGURATIONS = [2, 3, 4]
-
-
+boundaryConditions = [Paths.SOLID]
+numLocations = [10, 20]
+NUM_REPLICAS = 4
+LOCATION_CONFIGURATIONS = [1, 2]
 """
 
 6/23 SVD run
