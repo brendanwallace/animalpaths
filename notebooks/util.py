@@ -39,6 +39,7 @@ def describe(df):
     print("random locations seeds:", len(df["settings.randomSeedLocations"].unique()))
     print("patch recovery logic:", df["settings.recoveryLogic"].unique())
     print("steps:", df["steps"].max())
+    print(df.columns)
 
 
 def plot_patches(df, MAX_IMAGES=32):

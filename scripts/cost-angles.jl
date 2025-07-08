@@ -18,7 +18,7 @@ seriesName = "cost-angles"
 # What data to save.
 # Costs-angles needs to save all of this.
 SHORTEST_PATHS = true
-SAVE_PATHS = true
+SAVE_PATHS = false # <-- might not want to save this actually.
 SAVE_HEADINGS = true
 SAVE_PATCHES = true
 
