@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-searchStrategies = [Paths.KANAI_SUZUKI]
+searchStrategies = [Paths.GRID_WALK_MOORE, Paths.GRID_WALK_NEUMANN] # [Paths.KANAI_SUZUKI]
 
 # costs-angles doesn't really make sense with periodic boundaries.
 boundaryConditions = [Paths.SOLID]
@@ -23,7 +23,7 @@ SAVE_HEADINGS = true
 SAVE_PATCHES = true
 
 
-# 7/3 costs run
+# 7/21 costs run
 upf = 1000
 F = 20
 maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
