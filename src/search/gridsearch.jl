@@ -20,6 +20,9 @@ function hexneighbors(position::GridPosition)::Array{GridPosition}
     return neighbors
 end
 
+"""
+Returns the four neighbors in the Von Neumann neighborhood (up, down, left, right).
+"""
 function squareneighbors(position::GridPosition, X=nothing, Y=nothing)::Array{GridPosition}
     x, y = position
     neighbors = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
@@ -30,8 +33,33 @@ function squareneighbors(position::GridPosition, X=nothing, Y=nothing)::Array{Gr
 end
 
 @testitem "test square neighbors" begin
+    using Test, Paths
+
+end
 
 
+
+"""
+Returns the 8 neighbors in the Moore neighborhood.
+"""
+function mooreneighbors(position::GridPosition, X=nothing, Y=nothing)::Array{GridPosition}
+    x, y = position
+    neighbors = [
+        (x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1),
+        (x + 1, y + 1), (x + 1, y - 1), (x - 1, y  + 1), (x - 1, y - 1),
+    ]
+    if X !== nothing && Y !== nothing
+        neighbors = [(jmod(n[1], X), jmod(n[2], Y)) for n in neighbors]
+    end
+    return neighbors
+end
+
+
+@testitem "test moore neighbors" begin
+    using Test, Paths
+    @test issetequal(Set(Paths.mooreneighbors((10, 10))), Set(
+        [(11, 10), (9, 10), (10, 11), (10, 9), (11, 11), (11, 9), (9, 11), (9, 9)]
+    ))
 end
 
 """
