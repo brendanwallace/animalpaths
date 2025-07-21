@@ -47,9 +47,19 @@ include("visualize.jl")
     Paths.update!(grid)
     @test grid isa Paths.Simulation
 
-    hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
-    Paths.update!(hexgrid)
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
+    Paths.update!(grid)
     @test grid isa Paths.Simulation
+
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_MOORE, numWalkers=1, X=10, Y=10, numLocations=2))
+    Paths.update!(grid)
+    @test grid isa Paths.Simulation
+
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_MOORE, numWalkers=1, X=10, Y=10, numLocations=2))
+    Paths.update!(grid)
+    @test grid isa Paths.Simulation
+
+
 
     directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(directsearch)

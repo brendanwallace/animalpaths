@@ -76,6 +76,11 @@ and 6 more along the edges between the immediate neighbors.
 # end
 
 
+function distance(cp :: Tuple{Int64, Int64}, p :: Tuple{Int64, Int64})::Float64 
+
+    return sqrt((cp[1] - p[1])^2 + (cp[2] - p[2])^2)
+
+end
 
 
 
@@ -87,7 +92,7 @@ function gridSearch(
     elseif searchStrategy == GRID_WALK_NEUMANN
         neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
     elseif searchStrategy == GRID_WALK_MOORE
-        neighbors = (cp) -> [(p, costAt(world, p)) for p in mooreneighbors(cp)]
+        neighbors = (cp) -> [(p, costAt(world, p) * distance(cp, p)) for p in mooreneighbors(cp)]
     elseif searchStrategy == GRID_WALK_HEX_PLUS
         throw("not implemented")
     else
