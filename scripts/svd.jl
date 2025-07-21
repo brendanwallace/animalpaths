@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-searchStrategies = [Paths.KANAI_SUZUKI]
+searchStrategies = [Paths.GRID_WALK_MOORE, Paths.GRID_WALK_NEUMANN]
 seriesName = "SVD"
 
 # Data to save.
@@ -18,6 +18,23 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
+# 7/21 SVD run with other search strategies
+F = 20
+upf = 1000
+maxCosts = [2.0, 8.0]
+improvementRatios = [100]
+PRs = [0.001, 0.002]
+boundaryConditions = [Paths.SOLID]
+numLocations = [10, 20]
+LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
+NUM_REPLICAS = 128
+
+# Includes the shared `main` function.
+include("runs.jl")
+
+
+
+"""
 # 7/4 SVD run
 F = 20
 upf = 1000
@@ -29,12 +46,6 @@ numLocations = [10, 20]
 LOCATION_CONFIGURATIONS = [1, 2, 3, 4]
 NUM_REPLICAS = 128
 
-# Includes the shared `main` function.
-include("runs.jl")
-
-
-
-"""
 6/23 SVD run
     F = 200
     upf = 100
