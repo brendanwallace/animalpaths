@@ -24,9 +24,9 @@ upf = 1000
 maxCosts = [2.0, 8.0]
 improvementRatios = [100]
 PRs = [0.001]
-boundaryConditions = [Paths.SOLID]
-numLocations = [10, 20]
-LOCATION_CONFIGURATIONS = [1, 2]
+boundaryConditions = [Paths.PERIODIC]
+numLocations = [10]
+LOCATION_CONFIGURATIONS = [1]
 NUM_REPLICAS = 64
 
 # Includes the shared `main` function.

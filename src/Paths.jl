@@ -53,9 +53,6 @@ include("visualize.jl")
 
     grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_MOORE, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
-    @test grid isa Paths.Simulation
-
-    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_MOORE, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
     @test grid isa Paths.Simulation
 

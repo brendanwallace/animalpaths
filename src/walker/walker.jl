@@ -4,6 +4,9 @@ const WALKER_SPEED = 1.0
 const SHORTCUT_FIRST_SEARCH = true
 
 
+abstract type SearchWalker <: Walker end
+
+
 """
 Assigns a walker a new target, to be called after a walker arrives.
 
@@ -89,16 +92,16 @@ end
 """
 This walker uses the Kanai Suzuki shortest-path algorithm.
 """
-mutable struct SearchWalker <: Walker
+mutable struct KSWalker <: SearchWalker
     simulation::Simulation
     target::Union{Location,Nothing}
     position::Tuple{Float64,Float64}
     path::Array{Position}
-    SearchWalker(simulation, target, position) = new(simulation, target, position, [])
+    KSWalker(simulation, target, position) = new(simulation, target, position, [])
 end
 
 
-function newpath!(walker::SearchWalker)
+function newpath!(walker::KSWalker)
 
     if SHORTCUT_FIRST_SEARCH && walker.simulation.settings.boundaryConditions == SOLID
         if walker.simulation.steps == 0
@@ -200,7 +203,7 @@ integer-defined positions.
 
 TODO -- refactor this into shared code with SearchWalker.
 """
-mutable struct GridWalker <: Walker
+mutable struct GridWalker <: SearchWalker
     simulation::Simulation
     target::Union{Location,Nothing}
     position::Position
@@ -217,7 +220,10 @@ function newpath!(walker::GridWalker)
 
     gridPath::Array{GridPosition}, _ = gridSearch(
         walker.position, walker.target.position,
-        walker.simulation.world, walker.simulation.settings.searchStrategy)
+        walker.simulation.world, walker.simulation.settings.searchStrategy,
+        walker.simulation.settings.boundaryConditions,
+        walker.simulation.settings.X, walker.simulation.settings.Y
+        )
 
     walker.path = [Float64.(p) for p in gridPath]
 end
@@ -226,29 +232,29 @@ end
 """
 TODO – why does this not work if the paths are out-of-bounds?
 """
-function update!(walker::GridWalker)
+# function update!(walker::GridWalker)
 
-    walker.stepBudget += WALKER_SPEED
+#     walker.stepBudget += WALKER_SPEED
 
-    if walker.target isa Nothing || length(walker.path) <= 0
-        newtarget!(walker)
-        newpath!(walker)
-    end
-    # This can happen if there's only 1 location, or we somehow select the
-    # position we started at.
-    if length(walker.path) <= 0
-        @debug "walker $(walker) ran out of path without taking a step"
-        return
-    end
+#     if walker.target isa Nothing || length(walker.path) <= 0
+#         newtarget!(walker)
+#         newpath!(walker)
+#     end
+#     # This can happen if there's only 1 location, or we somehow select the
+#     # position we started at.
+#     if length(walker.path) <= 0
+#         @debug "walker $(walker) ran out of path without taking a step"
+#         return
+#     end
 
-    # check to make sure we have the step budget to go this far.
-    stepLength = norm(walker.position .- walker.path[1])
-    if stepLength <= walker.stepBudget
-        walker.position = popfirst!(walker.path)
-        improvePatch!(walker.simulation.world, roundtogrid(walker.position), stepLength)
-        walker.stepBudget -= stepLength
-    end
-end
+#     # check to make sure we have the step budget to go this far.
+#     stepLength = norm(walker.position .- walker.path[1])
+#     if stepLength <= walker.stepBudget
+#         walker.position = popfirst!(walker.path)
+#         improvePatch!(walker.simulation.world, roundtogrid(walker.position), stepLength)
+#         walker.stepBudget -= stepLength
+#     end
+# end
 
 
 

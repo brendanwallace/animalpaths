@@ -17,7 +17,7 @@ end
 
 function randomWalkers(settings::Settings, simulation::Simulation)::Array{Walker}
     if settings.searchStrategy == KANAI_SUZUKI
-        w = SearchWalker
+        w = KSWalker
     elseif settings.searchStrategy == GRADIENT_WALKER
         w = GradientWalker
     elseif settings.searchStrategy ∈ GRIDWALKS

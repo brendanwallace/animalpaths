@@ -55,6 +55,27 @@ function mooreneighbors(position::GridPosition, X=nothing, Y=nothing)::Array{Gri
 end
 
 
+function gridneighbors8(position::GridPosition, world::World, bc::BoundaryConditions, X, Y
+    )::Array{Tuple{GridPosition, Float64}}
+    x, y = position
+    straight = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    diagonal = [(x + 1, y + 1), (x + 1, y - 1), (x - 1, y  + 1), (x - 1, y - 1)]
+
+
+    neighbors::Array{Tuple{GridPosition, Float64}} = []
+    for (ps, distance) in [(straight, 1.0), (diagonal, sqrt(2.0))]
+        for p in ps
+            if bc == PERIODIC
+                p = (jmod(p[1], X), jmod(p[2], Y))
+            end
+            cost = distance * costAt(world, p)
+            push!(neighbors, (p, cost))
+        end
+    end
+    return neighbors
+end
+
+
 @testitem "test moore neighbors" begin
     using Test, Paths
     @test issetequal(Set(Paths.mooreneighbors((10, 10))), Set(
@@ -77,22 +98,22 @@ and 6 more along the edges between the immediate neighbors.
 
 
 function distance(cp :: Tuple{Int64, Int64}, p :: Tuple{Int64, Int64})::Float64 
-
     return sqrt((cp[1] - p[1])^2 + (cp[2] - p[2])^2)
-
 end
 
 
 
 function gridSearch(
-    source::Position, target::Position, world::World, searchStrategy::SearchStrategy)::Tuple{Path,Float64}
+    source::Position, target::Position, world::World, searchStrategy::SearchStrategy,
+    bc::BoundaryConditions, X::Int, Y::Int)::Tuple{Path,Float64}
     # if we're walking on a constrained grid, search should reflect it
     if searchStrategy == GRID_WALK_HEX
         neighbors = (cp) -> [(p, costAt(world, p)) for p in hexneighbors(cp)]
     elseif searchStrategy == GRID_WALK_NEUMANN
         neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
     elseif searchStrategy == GRID_WALK_MOORE
-        neighbors = (cp) -> [(p, costAt(world, p) * distance(cp, p)) for p in mooreneighbors(cp)]
+        neighbors = (cp) -> gridneighbors8(cp, world, bc, X, Y)
+        # neighbors = (cp) -> [(p, costAt(world, p) * distance(cp, p)) for p in mooreneighbors(cp)]
     elseif searchStrategy == GRID_WALK_HEX_PLUS
         throw("not implemented")
     else

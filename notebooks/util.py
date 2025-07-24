@@ -20,6 +20,7 @@ def load_data(datafile):
                                    ["settings", "randomSeedLocations"],
                                    ["settings", "recoveryLogic"],
                                    ["settings", "improvementLogic"],
+                                   ["settings", "searchStrategy"],
                                 ])
 
     df["ratio"] = df["settings.patchImprovement"] / df["settings.patchRecovery"]
@@ -38,6 +39,7 @@ def describe(df):
     print("random walker seeds:", len(df["settings.randomSeedWalkers"].unique()))
     print("random locations seeds:", len(df["settings.randomSeedLocations"].unique()))
     print("patch recovery logic:", df["settings.recoveryLogic"].unique())
+    print("settings.searchStrategy :", df["settings.searchStrategy"].unique())
     print("steps:", df["steps"].max())
     print(df.columns)
 
