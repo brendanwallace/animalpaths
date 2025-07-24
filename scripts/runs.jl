@@ -62,6 +62,7 @@ function main()
                                             randomSeedLocations=locationSeed,
                                             boundaryConditions=boundaryCondition,
                                             numLocations=nLocations,
+                                            numWalkers=numWalkers,
                                             # comfortWeight=comfort,
                                         )
 

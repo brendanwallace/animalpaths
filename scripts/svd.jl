@@ -8,7 +8,6 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-searchStrategies = [Paths.GRID_WALK_8, Paths.GRID_WALK_4]
 seriesName = "SVD"
 
 # Data to save.
@@ -18,7 +17,29 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
+# 7/24 SVD run with two search strategies and 100 walkers.
+# TODO - refactor improvement ratio, eventually
+F = 20
+upf = 1000
+maxCosts = [2.0]
+improvementRatios = [10]
+PRs = [0.001]
+boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
+numLocations = [10]
+LOCATION_CONFIGURATIONS = [1, 2]
+NUM_REPLICAS = 64
+numWalkers = 100
+searchStrategies = [Paths.GRID_WALK_8, Paths.KANAI_SUZUKI]
+
+
+# Includes the shared `main` function.
+include("runs.jl")
+
+
+
+"""
 # 7/21 SVD run with other search strategies
+searchStrategies = [Paths.GRID_WALK_8, Paths.GRID_WALK_4]
 F = 20
 upf = 1000
 maxCosts = [2.0, 8.0]
@@ -29,12 +50,6 @@ numLocations = [10]
 LOCATION_CONFIGURATIONS = [1]
 NUM_REPLICAS = 64
 
-# Includes the shared `main` function.
-include("runs.jl")
-
-
-
-"""
 # 7/4 SVD run
 F = 20
 upf = 1000
