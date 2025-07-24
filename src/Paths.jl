@@ -43,15 +43,15 @@ include("visualize.jl")
     Paths.update!(sim)
     @test sim isa Paths.Simulation
 
-    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_4, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
     @test grid isa Paths.Simulation
 
-    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_NEUMANN, numWalkers=1, X=10, Y=10, numLocations=2))
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_4, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
     @test grid isa Paths.Simulation
 
-    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_MOORE, numWalkers=1, X=10, Y=10, numLocations=2))
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_8, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
     Paths.update!(grid)
     @test grid isa Paths.Simulation

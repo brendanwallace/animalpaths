@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-searchStrategies = [Paths.GRID_WALK_MOORE, Paths.GRID_WALK_NEUMANN] # [Paths.KANAI_SUZUKI]
+searchStrategies = [Paths.GRID_WALK_8, Paths.GRID_WALK_4] # [Paths.KANAI_SUZUKI]
 
 # costs-angles doesn't really make sense with periodic boundaries.
 boundaryConditions = [Paths.SOLID]

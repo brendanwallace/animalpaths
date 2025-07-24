@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-searchStrategies = [Paths.GRID_WALK_NEUMANN, Paths.GRID_WALK_MOORE]
+searchStrategies = [Paths.GRID_WALK_4, Paths.GRID_WALK_8]
 
 boundaryConditions = [Paths.SOLID, Paths.PERIODIC]
 seriesName = "optimality"

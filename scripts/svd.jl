@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-searchStrategies = [Paths.GRID_WALK_MOORE, Paths.GRID_WALK_NEUMANN]
+searchStrategies = [Paths.GRID_WALK_8, Paths.GRID_WALK_4]
 seriesName = "SVD"
 
 # Data to save.

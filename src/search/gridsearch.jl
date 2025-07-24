@@ -109,9 +109,9 @@ function gridSearch(
     # if we're walking on a constrained grid, search should reflect it
     if searchStrategy == GRID_WALK_HEX
         neighbors = (cp) -> [(p, costAt(world, p)) for p in hexneighbors(cp)]
-    elseif searchStrategy == GRID_WALK_NEUMANN
+    elseif searchStrategy == GRID_WALK_4
         neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
-    elseif searchStrategy == GRID_WALK_MOORE
+    elseif searchStrategy == GRID_WALK_8
         neighbors = (cp) -> gridneighbors8(cp, world, bc, X, Y)
         # neighbors = (cp) -> [(p, costAt(world, p) * distance(cp, p)) for p in mooreneighbors(cp)]
     elseif searchStrategy == GRID_WALK_HEX_PLUS
