@@ -220,10 +220,7 @@ function newpath!(walker::GridWalker)
 
     gridPath::Array{GridPosition}, _ = gridSearch(
         walker.position, walker.target.position,
-        walker.simulation.world, walker.simulation.settings.searchStrategy,
-        walker.simulation.settings.boundaryConditions,
-        walker.simulation.settings.X, walker.simulation.settings.Y
-        )
+        walker.simulation.world, walker.simulation.settings)
 
     walker.path = [Float64.(p) for p in gridPath]
 end

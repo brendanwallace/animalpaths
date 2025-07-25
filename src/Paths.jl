@@ -49,12 +49,13 @@ include("visualize.jl")
 
     grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_4, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
-    @test grid isa Paths.Simulation
+    @test Paths.takeSnapshot(grid) isa Paths.Snapshot
+
 
     grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_8, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(grid)
     Paths.update!(grid)
-    @test grid isa Paths.Simulation
+    @test Paths.takeSnapshot(grid, shortestpaths=true, savepaths=true, saveheadings=true) isa Paths.Snapshot
 
 
 

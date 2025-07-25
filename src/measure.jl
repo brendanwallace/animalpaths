@@ -47,7 +47,7 @@ function shortestPath(
         return shortestPathKanaiSuzuki(source, target, costs(world), numSteinerPoints=settings.numSteinerPoints)
     elseif settings.searchStrategy ∈ [GRID_WALK_4, GRID_WALK_HEX, GRID_WALK_HEX_PLUS, GRID_WALK_8]
 
-        return gridSearch(source, target, world, settings.searchStrategy)
+        return gridSearch(source, target, world, settings)
 
     else
         throw("no shortest path method found for $(settings.searchStrategy)")

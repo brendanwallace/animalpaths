@@ -104,20 +104,19 @@ end
 
 
 function gridSearch(
-    source::Position, target::Position, world::World, searchStrategy::SearchStrategy,
-    bc::BoundaryConditions, X::Int, Y::Int)::Tuple{Path,Float64}
+    source::Position, target::Position, world::World, settings::Settings)
     # if we're walking on a constrained grid, search should reflect it
-    if searchStrategy == GRID_WALK_HEX
+    if settings.searchStrategy == GRID_WALK_HEX
         neighbors = (cp) -> [(p, costAt(world, p)) for p in hexneighbors(cp)]
-    elseif searchStrategy == GRID_WALK_4
+    elseif settings.searchStrategy == GRID_WALK_4
         neighbors = (cp) -> [(p, costAt(world, p)) for p in squareneighbors(cp)]
-    elseif searchStrategy == GRID_WALK_8
-        neighbors = (cp) -> gridneighbors8(cp, world, bc, X, Y)
+    elseif settings.searchStrategy == GRID_WALK_8
+        neighbors = (cp) -> gridneighbors8(cp, world, settings.boundaryConditions, settings.X, settings.Y)
         # neighbors = (cp) -> [(p, costAt(world, p) * distance(cp, p)) for p in mooreneighbors(cp)]
-    elseif searchStrategy == GRID_WALK_HEX_PLUS
+    elseif settings.searchStrategy == GRID_WALK_HEX_PLUS
         throw("not implemented")
     else
-        throw("search strategy not recognized as a grid search $(searchStrategy)")
+        throw("search strategy not recognized as a grid search $(settings.searchStrategy)")
     end
 
     heuristic = (p) -> norm(p .- roundtogrid(target))
