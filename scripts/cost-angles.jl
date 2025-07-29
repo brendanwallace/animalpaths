@@ -24,7 +24,6 @@ SAVE_PATCHES = true
 
 
 
-include("runs.jl")
 
 # 7/29 costs run
 searchStrategies = [Paths.KANAI_SUZUKI]
@@ -36,6 +35,9 @@ boundaryConditions = [Paths.SOLID]
 numLocations = [10, 20]
 NUM_REPLICAS = 4
 LOCATION_CONFIGURATIONS = [1, 2]
+
+
+include("runs.jl")
 
 
 """
