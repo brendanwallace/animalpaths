@@ -59,11 +59,12 @@ include("visualize.jl")
 
 
 
-    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, X=10, Y=10, numLocations=2))
+    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_WALK, numWalkers=1, X=10, Y=10, numLocations=2))
     Paths.update!(directsearch)
     @test directsearch isa Paths.Simulation
 
     heuristicsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.HEURISTIC_WALK, numWalkers=1, X=10, Y=10, numLocations=2))
+    Paths.update!(heuristicsearch)
     Paths.update!(heuristicsearch)
     @test heuristicsearch isa Paths.Simulation
 end

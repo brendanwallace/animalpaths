@@ -42,7 +42,7 @@ Routes to the appropriate search algorithm given `settings`
 function shortestPath(
     source::Position, target::Position, world::World, settings::Settings)::Tuple{Path,Float64}
 
-    if settings.searchStrategy ∈ [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER]
+    if settings.searchStrategy ∈ [KANAI_SUZUKI, DIRECT_WALK, GRADIENT_WALK]
         # use exact search for these.
         return shortestPathKanaiSuzuki(source, target, costs(world), numSteinerPoints=settings.numSteinerPoints)
     elseif settings.searchStrategy ∈ [GRID_WALK_4, GRID_WALK_HEX, GRID_WALK_HEX_PLUS, GRID_WALK_8]
@@ -245,11 +245,14 @@ end
     @test Paths.takeSnapshot(sim) isa Paths.Snapshot
 
     grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_4, numWalkers=1, X=10, Y=10, numLocations=2))
-    @test Paths.takeSnapshot(grid) isa Paths.Snapshot
+    @test Paths.takeSnapshot(grid, savepaths=true) isa Paths.Snapshot
 
-    hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_4, numWalkers=1, X=10, Y=10, numLocations=2))
+    grid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_8, numWalkers=1, X=10, Y=10, numLocations=2))
+    @test Paths.takeSnapshot(grid, savepaths=true) isa Paths.Snapshot
+
+    hexgrid = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.GRID_WALK_HEX, numWalkers=1, X=10, Y=10, numLocations=2))
     @test Paths.takeSnapshot(hexgrid) isa Paths.Snapshot
 
-    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_SEARCH, numWalkers=1, X=10, Y=10, numLocations=2))
+    directsearch = Paths.MakeSimulation(Paths.Settings(searchStrategy=Paths.DIRECT_WALK, numWalkers=1, X=10, Y=10, numLocations=2))
     @test Paths.takeSnapshot(directsearch) isa Paths.Snapshot
 end

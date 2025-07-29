@@ -16,16 +16,10 @@ end
 
 
 function randomWalkers(settings::Settings, simulation::Simulation)::Array{Walker}
-    if settings.searchStrategy == KANAI_SUZUKI
-        w = KSWalker
-    elseif settings.searchStrategy == GRADIENT_WALKER
-        w = GradientWalker
-    elseif settings.searchStrategy ∈ GRIDWALKS
-        w = GridWalker
-    elseif settings.searchStrategy == DIRECT_SEARCH
-        w = DirectWalker
-    elseif settings.searchStrategy == HEURISTIC_WALK
-        w = HeuristicWalker
+    if settings.searchStrategy ∈ SEARCH_WALKS
+        w = SearchWalker
+    elseif settings.searchStrategy ∈ STEP_WALKS
+        w = StepWalker
     else
         throw("unhandled search strategy in function randomWalkers(): $(settings.searchStrategy)")
     end

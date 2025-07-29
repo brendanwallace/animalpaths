@@ -27,8 +27,8 @@ HEX_WORLD neighborhoods.
     # Currently these only works with SQUARE_WORLD neighborhood and allow for
     # continuous movement.
     KANAI_SUZUKI = 1
-    DIRECT_SEARCH = 2
-    GRADIENT_WALKER = 3
+    DIRECT_WALK = 2
+    GRADIENT_WALK = 3
     GRID_WALK_4 = 4
     GRID_WALK_8 = 5
     GRID_WALK_HEX = 6
@@ -37,9 +37,10 @@ HEX_WORLD neighborhoods.
 end
 
 # These all sets of strategies that share a lot of logic.
-const GRIDWALKS = [GRID_WALK_4, GRID_WALK_8, GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
-const SQUARE_WORLD_STRATEGIES = [KANAI_SUZUKI, DIRECT_SEARCH, GRADIENT_WALKER, GRID_WALK_4, GRID_WALK_8, HEURISTIC_WALK]
+const SEARCH_WALKS = [KANAI_SUZUKI, GRID_WALK_4, GRID_WALK_8, GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
+const SQUARE_WORLD_STRATEGIES = [KANAI_SUZUKI, DIRECT_WALK, GRADIENT_WALK, GRID_WALK_4, GRID_WALK_8, HEURISTIC_WALK]
 const HEX_WORLD_STRATEGIES = [GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
+const STEP_WALKS = [DIRECT_WALK, GRADIENT_WALK, HEURISTIC_WALK]
 
 # """
 # Controls whether the world is a square grid or a hexagon grid.
@@ -71,7 +72,7 @@ end
 
     # Only applies to the KANAI_SUZUKI algorithm
     numSteinerPoints::Int64 = 3
-    # analog to maxCost, used for GRADIENT_WALKER search strategy only
+    # analog to maxCost, used for GRADIENT_WALK search strategy only
     comfortWeight::Float64 = 0.5
 
     # WORLD SETTINGS

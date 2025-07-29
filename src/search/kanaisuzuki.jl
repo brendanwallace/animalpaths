@@ -1,4 +1,5 @@
 const DICT_SIGS = 4
+const DEFAULT_MAX_STEPS = 3
 
 """
 Rounds to 4 significant digits, for use in nodesByPosition dictionary
@@ -363,14 +364,14 @@ Main exported function of this file. Implements the any-directional search algor
 """
 function shortestPathKanaiSuzuki(
     source::Position, target::Position, costs::Matrix{Float64};
-    bc::BoundaryConditions=SOLID, deltaThreshold=0.1, maxSteps=3,
+    bc::BoundaryConditions=SOLID, deltaThreshold=0.1, maxSteps=DEFAULT_MAX_STEPS,
     numSteinerPoints::Int64=3)::Tuple{Path,Float64}
     # TODO – switch these to rounding instead of flooring.
     # TODO – check to make sure these are inbounds?
     source = floor.(source)
     target = floor.(target)
 
-    @info "searching from $(source) to $(target)"
+    # @info "searching from $(source) to $(target)"
 
     nodesByPosition = Dict{Paths.Position,Node}(source => Node(source), target => Node(target))
     visitedFaces = Set{Paths.Face}()
@@ -396,13 +397,13 @@ function shortestPathKanaiSuzuki(
     # nodesByPosition, nodesByFace = constructOriginalGraph(costs)
 
 
-    @debug "running initial search"
+    @info "running initial search"
     # path = []
     # pathCost = Inf
     path, pathCost = astar(nodesByPosition[source], nodesByPosition[target], initialNeighbors, heuristic)
-    @debug "initial astar search populated $(length(nodesByPosition)) nodesByPosition"
+    @info "initial astar search populated $(length(nodesByPosition)) nodesByPosition"
 
-    # @info "found path of cost $(pathCost), $([p.position for p in path])"
+    @info "found path of cost $(pathCost), $([p.position for p in path])"
 
     delta = Inf
     i = 1
@@ -417,13 +418,13 @@ function shortestPathKanaiSuzuki(
 
         # Step 2 - construct G_{n+1}
         # Add steiner points
-        @info "adding steiner points"
+        # @info "adding steiner points"
         divideOriginalEdges!(nodesByPosition, numSteinerPoints, bc, X, Y)
 
-        @info "connecting edges"
+        # @info "connecting edges"
         connectAcrossFaces!(nodesByPosition, costs)
 
-        @info "step $(i) – searching over $(length(nodesByPosition)) nodesByPosition"
+        # @info "step $(i) – searching over $(length(nodesByPosition)) nodesByPosition"
         # Step 3 - a-star G_n
         neighbors = (n) -> [(e.node, e.cost) for e in n.neighbors]
         # h = n->norm(n.position .- nodesByPosition[target].position)
@@ -431,11 +432,11 @@ function shortestPathKanaiSuzuki(
         delta = pathCost - newPathCost
         pathCost = newPathCost
         i += 1
-        # @info "found path of cost $(pathCost), $([p.position for p in path])"
+        @info "found path of cost $(pathCost), $([p.position for p in path])"
 
     end
 
-    # @info "returning path of cost $(pathCost), $([p.position for p in path])"
+    @info "returning path of cost $(pathCost), $([p.position for p in path])"
     for p in path
         @debug "$(p.position)"
         # for e in p.neighbors
@@ -475,7 +476,7 @@ end
     @test c ≈ norm((9, 9))
     p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (10.0, 10.0), zeros(Float64, (10, 10)) .+ 5, deltaThreshold=δ, numSteinerPoints=2)
     @test c ≈ 5 * norm((9, 9))
-    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (4.0, 5.0), zeros(Float64, (10, 10)) .+ 5, deltaThreshold=δ, numSteinerPoints=2)
+    p, c = Paths.shortestPathKanaiSuzuki((1.0, 1.0), (4.0, 5.0), zeros(Float64, (10, 10)) .+ 5, deltaThreshold=δ, numSteinerPoints=2, maxSteps=3)
     @test c - 5 * 5 < tolerance
     p, c = Paths.shortestPathKanaiSuzuki((2.0, 2.0), (5.0, 5.0),
         [

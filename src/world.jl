@@ -69,7 +69,11 @@ end
 
 
 function costs(world::AbstractWorld)::Array{Float64}
-    return world.settings.maxCost .* (1.0 .- world.patches) .+ (1.0 .* world.patches)
+
+    @info "world patches $(world.patches)"
+    c = (world.settings.maxCost .* (1.0 .- world.patches)) .+ (1.0 .* world.patches)
+    @info "world costs: $(c)"
+    return c
 end
 
 """
@@ -84,6 +88,7 @@ function _improvePatch!(world::AbstractWorld, x::Int, y::Int, improvement::Float
 
     if world.settings.improvementLogic == LINEAR
         world.patches[x, y] += r
+        world.patches[x, y] = clamp(world.patches[x, y], 0.0, 1.0)
     elseif world.settings.improvementLogic == SATURATING
         world.patches[x, y] += (r * (1 - world.patches[x, y]))
     elseif world.settings.improvementLogic == LOGISTIC
@@ -149,4 +154,31 @@ function improvePatch!(world::World, gridPosition::GridPosition, weight)
     else
         throw("unknown grid type $(world.settings.searchStrategy)")
     end
+end
+
+
+
+"""
+Returns the gradient of path comfort, at `position`.
+"""
+function gradientAt(position::Position, world::World)::Position
+    x, y = Int.(floor.(position))
+    gX = 0.0
+    gY = 0.0
+    sobelX = [
+        [-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1]]
+    sobelY = [
+        [-1, -2, -1],
+        [0, 0, 0],
+        [1, 2, 1]]
+    for dx in [-1, 0, 1]
+        for dy in [-1, 0, 1]
+            gX += comfortAt(world, x + dx, y + dy) * sobelX[dy+2][dx+2]
+            gY += comfortAt(world, x + dx, y + dy) * sobelY[dy+2][dx+2]
+        end
+    end
+    # println("gradient", (gX, gY))
+    return (gX, gY)
 end

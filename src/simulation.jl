@@ -22,6 +22,13 @@ layout, for example, these do not map exactly to Euclidean coordinates.
 In a Square World, these kind of map to the bottom-left corner of a patch.
 """
 const GridPosition = Tuple{Integer,Integer}
+
+
+"""
+
+"""
+# const Direction = Tuple{Float64, Float64}
+
 # const Vector = Tuple{Float64, Float64}
 
 """

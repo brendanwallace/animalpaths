@@ -41,14 +41,15 @@ function viz(sim; showtext=true, showwalkers=true, showlocations=true, markersiz
     return patches
 end
 
-function animate(upf=5, frames=100, settings=Paths.Settings())
-    sim = Paths.MakeSimulation(settings)
+
+function animate(settings; upf=100, frames=100, showtext=false)
+    sim = MakeSimulation(settings);
+    
     @gif for t in 1:frames
+        print("\r$(t)/$(frames)")
         for u in 1:upf
-            Paths.update!(sim)
+            update!(sim)
         end
-        # p = [(sim.world.patches...)...]
-        # histogram(p[p.>0.2])
-        Paths.viz(sim)
+        viz(sim, markersize=7, showtext=showtext)
     end
 end
