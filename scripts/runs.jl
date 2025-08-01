@@ -83,7 +83,7 @@ function main()
                                             if f == F
                                                 push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
                                                     shortestpaths=true,
-                                                    savepaths=true,
+                                                    savepaths=SAVE_PATHS, # don't default to saving these.
                                                     saveheadings=true,
                                                     savepatches=true,
                                                 ))

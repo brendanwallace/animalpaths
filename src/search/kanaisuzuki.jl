@@ -254,7 +254,7 @@ function divideOriginalEdges!(nodesByPosition::Dict{Position,Node}, steinerPoint
         for edge in copy(source.neighbors)
             # delete the originalEdge and add numSteinerPoints new originalEdges
             if edge.isOriginal
-                delete!(source.neighbors, edge)
+                # delete!(source.neighbors, edge)
                 subdivideEdge!(source, edge.node, edge.cost, nodesByPosition, steinerPoints, bc, X, Y)
             end
         end
@@ -365,7 +365,7 @@ Main exported function of this file. Implements the any-directional search algor
 function shortestPathKanaiSuzuki(
     source::Position, target::Position, costs::Matrix{Float64};
     bc::BoundaryConditions=SOLID, deltaThreshold=0.1, maxSteps=DEFAULT_MAX_STEPS,
-    numSteinerPoints::Int64=3)::Tuple{Path,Float64}
+    numSteinerPoints::Int64=3, ϵ=0.000000001)::Tuple{Path,Float64}
     # TODO – switch these to rounding instead of flooring.
     # TODO – check to make sure these are inbounds?
     source = floor.(source)
@@ -397,13 +397,13 @@ function shortestPathKanaiSuzuki(
     # nodesByPosition, nodesByFace = constructOriginalGraph(costs)
 
 
-    @info "running initial search"
+    @debug "running initial search"
     # path = []
     # pathCost = Inf
     path, pathCost = astar(nodesByPosition[source], nodesByPosition[target], initialNeighbors, heuristic)
-    @info "initial astar search populated $(length(nodesByPosition)) nodesByPosition"
+    @debug "initial astar search populated $(length(nodesByPosition)) nodesByPosition"
 
-    @info "found path of cost $(pathCost), $([p.position for p in path])"
+    @debug "found path of cost $(pathCost), $([p.position for p in path])"
 
     delta = Inf
     i = 1
@@ -426,17 +426,17 @@ function shortestPathKanaiSuzuki(
 
         # @info "step $(i) – searching over $(length(nodesByPosition)) nodesByPosition"
         # Step 3 - a-star G_n
-        neighbors = (n) -> [(e.node, e.cost) for e in n.neighbors]
+        neighbors = (n) -> [(e.node, e.cost + ϵ) for e in n.neighbors]
         # h = n->norm(n.position .- nodesByPosition[target].position)
         path, newPathCost = astar(nodesByPosition[source], nodesByPosition[target], neighbors, heuristic)
         delta = pathCost - newPathCost
         pathCost = newPathCost
         i += 1
-        @info "found path of cost $(pathCost), $([p.position for p in path])"
+        @debug "found path of cost $(pathCost), $([p.position for p in path])"
 
     end
 
-    @info "returning path of cost $(pathCost), $([p.position for p in path])"
+    @debug "returning path of cost $(pathCost), $([p.position for p in path])"
     for p in path
         @debug "$(p.position)"
         # for e in p.neighbors

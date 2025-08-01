@@ -35,8 +35,8 @@ function newpath!(walker::SearchWalker)
             bc=walker.simulation.settings.boundaryConditions,
             numSteinerPoints=walker.simulation.settings.numSteinerPoints,
         )
-        @info "$(walker.simulation.steps) walker heading from $(walker.position) to $(walker.target.position)"
-        # @info "using path $(walker.path)"
+        @debug "$(walker.simulation.steps) walker heading from $(walker.position) to $(walker.target.position)"
+        # @debug "using path $(walker.path)"
     elseif strategy ∈ [GRID_WALK_4, GRID_WALK_8, GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
         gridPath::Array{GridPosition}, _ = gridSearch(
             walker.position, walker.target.position,
@@ -60,7 +60,7 @@ function update!(walker::SearchWalker)
     travelBudget = WALKER_SPEED
     while travelBudget > 0
         if length(walker.path) == 0
-            # @info "walker ran out of path at $(walker.position) without arriving at $(walker.target.position)."
+            # @debug "walker ran out of path at $(walker.position) without arriving at $(walker.target.position)."
             prevTarget = walker.target
 
             newtarget!(walker)
@@ -78,7 +78,7 @@ function update!(walker::SearchWalker)
                 walker.simulation.settings.Y)
         end
 
-        # @info "nextPosition: $(nextPosition), stepLength: $(stepLength), travelBudget: $(travelBudget)"
+        # @debug "nextPosition: $(nextPosition), stepLength: $(stepLength), travelBudget: $(travelBudget)"
         
         # If this step would take us past our remaining travel budget, we want
         # to use up the rest of the travel budget but not pop the next position
@@ -99,7 +99,7 @@ function update!(walker::SearchWalker)
         end
 
         walker.position = nextPosition
-        @info "$(walker.position), $(stepLength)"
+        @debug "$(walker.position), $(stepLength)"
         facesToImprove = faces((nextPosition .+ walker.position) ./ 2)
         for face in facesToImprove
             improvePatch!(
@@ -109,7 +109,7 @@ function update!(walker::SearchWalker)
             )
         end
     end
-    @info "$(walker.simulation.steps) $(walker.position)"
+    @debug "$(walker.simulation.steps) $(walker.position)"
 end
 
 

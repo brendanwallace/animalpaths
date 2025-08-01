@@ -1,6 +1,10 @@
 import Base.@kwdef
+import StatsBase
+
 
 const FULLY_IMPROVED_THRESHOLD = 0.99
+
+const DOWNSAMPLE_BINS = 1024
 
 """
 Measures features of the network at a snapshot in time.
@@ -153,6 +157,17 @@ function allWeightedHeadings(paths::Array{Path})::Array{Tuple{Float64,Float64}}
 end
 
 
+
+function downsampleWeightedHeadings(headings :: Array{Tuple{Float64,Float64}}, nbins=DOWNSAMPLE_BINS) :: Array{Tuple{Float64, Float64}}
+    h = StatsBase.fit(StatsBase.Histogram, [h[1] for h in headings], StatsBase.aweights([h[2] for h in headings]), nbins=nbins)
+    weightedHeadings = []
+    for i in 1:length(h.weights)
+        push!(weightedHeadings, (h.edges[1][i], h.weights[i]))
+    end
+    weightedHeadings
+end
+
+
 function firstMoment(valWeightPairs::Array{Tuple{Float64,Float64}})::Float64
     totalVal, totalWeight = 0.0, 0.0
     for (val, weight) ∈ valWeightPairs
@@ -222,7 +237,7 @@ function takeSnapshot(sim::Paths.Simulation;
             snapshot.paths = paths
         end
         if saveheadings
-            snapshot.weightedHeadings = allWeightedHeadings(paths)
+            snapshot.weightedHeadings = downsampleWeightedHeadings(allWeightedHeadings(paths))
             snapshot.avgHeading = firstMoment(snapshot.weightedHeadings)
             snapshot.avgSquareHeading = secondMoment(snapshot.weightedHeadings)
         end

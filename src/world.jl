@@ -70,9 +70,9 @@ end
 
 function costs(world::AbstractWorld)::Array{Float64}
 
-    @info "world patches $(world.patches)"
+    @debug "world patches $(world.patches)"
     c = (world.settings.maxCost .* (1.0 .- world.patches)) .+ (1.0 .* world.patches)
-    @info "world costs: $(c)"
+    @debug "world costs: $(c)"
     return c
 end
 

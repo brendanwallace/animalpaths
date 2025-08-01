@@ -6,6 +6,35 @@ import math
 import seaborn as sns
 
 
+# import ijson
+
+# def load_data(datafile):
+#     records = []
+#     with open(datafile) as file:
+#         i = 0
+#         for o in ijson.items(file, "item"):
+#             record = pd.json_normalize(o,
+#                 record_path=["snapshots"],
+#                    meta=[
+#                        ["settings", "patchImprovement"],
+#                        ["settings", "patchRecovery"],
+#                        ["settings", "maxCost"],
+#                        ["settings", "boundaryConditions"],
+#                        ["settings", "numLocations"],
+#                        ["settings", "randomSeedWalkers"],
+#                        ["settings", "randomSeedLocations"],
+#                        ["settings", "recoveryLogic"],
+#                        ["settings", "improvementLogic"],
+#                        ["settings", "searchStrategy"],
+#                     ])
+#             records.append(record)
+#             print(f"loaded {i} records from {datafile}.\r", end="")
+#             i += 1
+#     df = pd.concat(records)
+#     df["ratio"] = df["settings.patchImprovement"] / df["settings.patchRecovery"]
+#     return df
+
+
 def load_data(datafile):
     # load the json, and normalize into a dataframe
     with open(datafile) as f:
@@ -23,9 +52,9 @@ def load_data(datafile):
                                    ["settings", "searchStrategy"],
                                 ])
 
-    df["ratio"] = df["settings.patchImprovement"] / df["settings.patchRecovery"]
     # hopefully won't be necessary forever
     # df["run_id"] = [i // 201 for i in range(df.shape[0])]
+    df["ratio"] = df["settings.patchImprovement"] / df["settings.patchRecovery"]
 
 
     return df
