@@ -34,7 +34,7 @@ maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
 improvementRatios = [100]
 PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
-numLocations = [10]
+numLocations = [10, 20]
 NUM_REPLICAS = 4
 LOCATION_CONFIGURATIONS = [1]
 
