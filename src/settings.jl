@@ -77,8 +77,22 @@ end
 
     # WORLD SETTINGS
     # gridType::GridType = SQUARE_WORLD
-    patchImprovement::Float64 = 0.2
-    patchRecovery::Float64 = 0.002
+    patchImprovement = nothing
+    patchRecovery = nothing
+
+    """
+    Time for a fully improved trail to decay back to 0 improvement, assuming
+    linear decay.
+    """
+    trailLifetime::Float64 = 100.0
+
+
+    """
+    Length of trail, in units of X, that the existing number of walkers can
+    support if they all walk continuously over one length of trail.
+    """
+    trailBudget::Float64 = 1.0
+
     diffusionRadius::Integer = 3
     diffusionGaussianVariance::Float64 = 1.0
     improvementLogic::PatchLogic = LOGISTIC

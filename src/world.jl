@@ -69,10 +69,7 @@ end
 
 
 function costs(world::AbstractWorld)::Array{Float64}
-
-    @debug "world patches $(world.patches)"
     c = (world.settings.maxCost .* (1.0 .- world.patches)) .+ (1.0 .* world.patches)
-    @debug "world costs: $(c)"
     return c
 end
 
@@ -125,6 +122,9 @@ Applies gaussian diffusion of the improvement in a small neighborhood around
 the targetted grid position.
 """
 function improvePatch!(world::World, gridPosition::GridPosition, weight)
+
+    patchImprovement = world.settings.patchImprovement
+
     r = world.settings.diffusionRadius
     x, y = gridPosition
     # _improvePatch!(world, x, y, weight*world.simulation.patchImprovement)
@@ -134,7 +134,7 @@ function improvePatch!(world::World, gridPosition::GridPosition, weight)
                 _x, _y = x + dx, y + dy
                 if _x >= 1 && _x <= world.settings.X && _y >= 1 && _y <= world.settings.Y
                     improvementValue = weight * gaussianDiffusion(
-                        world.settings.patchImprovement, world.settings.diffusionGaussianVariance, dx, dy)
+                        patchImprovement, world.settings.diffusionGaussianVariance, dx, dy)
                     _improvePatch!(world, _x, _y, improvementValue)
                 end
             end
@@ -144,7 +144,7 @@ function improvePatch!(world::World, gridPosition::GridPosition, weight)
             for (_x, _y) in hexneighbors(x, y, r)
                 if _x >= 1 && _x <= world.settings.X && _y >= 1 && _y <= world.settings.Y
                     improvementValue = weight * gaussianDiffusion(
-                        world.settings.patchImprovement, world.settings.diffusionGaussianVariance, 0, r)
+                        patchImprovement, world.settings.diffusionGaussianVariance, 0, r)
                     _improvePatch!(world, _x, _y, improvementValue)
                 end
             end

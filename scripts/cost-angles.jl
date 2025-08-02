@@ -12,7 +12,7 @@ numWalkers = 10
 
 # costs-angles doesn't really make sense with periodic boundaries.
 boundaryConditions = [Paths.SOLID]
-seriesName = "cost-angles"
+seriesName = "cost-angles-2"
 
 
 # What data to save.
@@ -36,7 +36,7 @@ PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
 numLocations = [10, 20]
 NUM_REPLICAS = 4
-LOCATION_CONFIGURATIONS = [1]
+LOCATION_CONFIGURATIONS = [2]
 
 
 

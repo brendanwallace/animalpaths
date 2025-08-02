@@ -35,7 +35,6 @@ function newpath!(walker::SearchWalker)
             bc=walker.simulation.settings.boundaryConditions,
             numSteinerPoints=walker.simulation.settings.numSteinerPoints,
         )
-        @debug "$(walker.simulation.steps) walker heading from $(walker.position) to $(walker.target.position)"
         # @debug "using path $(walker.path)"
     elseif strategy ∈ [GRID_WALK_4, GRID_WALK_8, GRID_WALK_HEX, GRID_WALK_HEX_PLUS]
         gridPath::Array{GridPosition}, _ = gridSearch(
@@ -99,7 +98,6 @@ function update!(walker::SearchWalker)
         end
 
         walker.position = nextPosition
-        @debug "$(walker.position), $(stepLength)"
         facesToImprove = faces((nextPosition .+ walker.position) ./ 2)
         for face in facesToImprove
             improvePatch!(
@@ -109,7 +107,6 @@ function update!(walker::SearchWalker)
             )
         end
     end
-    @debug "$(walker.simulation.steps) $(walker.position)"
 end
 
 

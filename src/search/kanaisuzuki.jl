@@ -107,16 +107,12 @@ This currently adds two versions of each edge, but one is potentially lower-cost
 not really be worth the time to implement that though.
 """
 function subdivideEdge!(source::Node, target::Node, edgeCost, nodesByPosition::Dict{Position,Node}, numSteinerPoints::Int64, bc, X, Y)
-    @debug "subdividing from $(source.position) to $(target.position)"
     # Vector that points in the direction of the edge
     steinerPointNodes = Node[]
     originalEdgeVector = target.position .- source.position
     if norm(originalEdgeVector) > 1.0
-        @debug "$(originalEdgeVector) from $(source.position) to $(target.position) is too long"
-
         originalEdgeVector = correctForPeriodic.(originalEdgeVector, (X, Y))
 
-        @debug "using $(originalEdgeVector)"
         @assert norm(originalEdgeVector) <= 1.0
         # throw("ending there.")
     end
@@ -137,14 +133,12 @@ function subdivideEdge!(source::Node, target::Node, edgeCost, nodesByPosition::D
             nodesByPosition[r(newPosition)] = steinerPointNode
         end
         newEdge = Edge(steinerPointNode, newEdgeCost, true)
-        @debug "new edge from $(from.position) $(newEdge)"
         push!(from.neighbors, newEdge) # pushOrUpdate!(from.neighbors, newEdge)
         from = steinerPointNode
         push!(steinerPointNodes, steinerPointNode)
     end
     # Add the final edge -- which we know is to originalEdge.node
     newEdge = Edge(target, newEdgeCost, true)
-    @debug "new edge from $(from.position) $(newEdge)"
     push!(from.neighbors, newEdge)
     return steinerPointNodes
 end
@@ -206,7 +200,6 @@ function exploreFace!(nodesByPosition, face, costs, numSteinerPoints, bc::Bounda
     # Look up or create all the steiner points.
     steinerPoints = constructOriginalEdges(corners, faceCost, nodesByPosition, numSteinerPoints, bc, X, Y)
     connectAcrossFace!(vcat(corners, steinerPoints), faceCost, bc, X, Y)
-    @debug "added $(length(corners)) corners and $(length(steinerPoints)) steiner Points"
 end
 
 
@@ -215,10 +208,6 @@ Explores the four faces this node is adjacent to, thereby providing all
 possible neighbors.
 """
 function populateNeighbors!(node, nodesByPosition, visitedFaces, costs, numSteinerPoints, bc::BoundaryConditions)
-    @debug "populating neighbors of $(node.position) ($(length(node.neighbors)))"
-    # for e in node.neighbors
-    #     @debug "      $(e)"
-    # end
     for face in faces(node.position)
         x, y = face
         X, Y = size(costs)
@@ -227,17 +216,11 @@ function populateNeighbors!(node, nodesByPosition, visitedFaces, costs, numStein
             face = (x, y) = (jmod(x, X), jmod(y, Y))
         end
 
-        @debug "$(face) in $(visitedFaces): $(face in visitedFaces)"
         if x >= 1 && y >= 1 && x <= X && y <= Y && !(face in visitedFaces)
             push!(visitedFaces, face)
             exploreFace!(nodesByPosition, face, costs, numSteinerPoints, bc)
-            @debug "exploring face $(face). faces explored: $(visitedFaces)"
         end
     end
-    @debug "populated: $(node.position) ($(length(node.neighbors)))"
-    # for e in node.neighbors
-    #     @debug "      $(e)"
-    # end
 end
 
 # nodesByPosition = Dict{Position, Node}((1., 1.) => Node((1., 1.)))
@@ -429,20 +412,14 @@ function shortestPathKanaiSuzuki(
         neighbors = (n) -> [(e.node, e.cost + ϵ) for e in n.neighbors]
         # h = n->norm(n.position .- nodesByPosition[target].position)
         path, newPathCost = astar(nodesByPosition[source], nodesByPosition[target], neighbors, heuristic)
-        delta = pathCost - newPathCost
+        delta = abs(pathCost - newPathCost)
         pathCost = newPathCost
+        @debug "search $(i) found path of cost $(pathCost), delta $(delta), $([p.position for p in path])"
         i += 1
-        @debug "found path of cost $(pathCost), $([p.position for p in path])"
-
     end
 
     @debug "returning path of cost $(pathCost), $([p.position for p in path])"
-    for p in path
-        @debug "$(p.position)"
-        # for e in p.neighbors
-        #     @debug "      $(e)"
-        # end
-    end
+
 
     return ([n.position for n in path], pathCost)
 end
