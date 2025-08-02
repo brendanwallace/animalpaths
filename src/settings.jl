@@ -1,5 +1,9 @@
 import Base.@kwdef
 
+
+const DEFAULT_TRAIL_BUDGET = 5
+const DEFAULT_TRAIL_LIFETIME = 1000
+
 # Controls where walkers go.
 @enum Scenario begin
     RANDOM_FIXED = 1

@@ -24,6 +24,10 @@ Node(pos) = Node(pos, [])
 
 Base.show(io::IO, n::Node) = print(io, "{$(n.position)}")
 
+Base.hash(n::Node) = hash(n.position)
+
+Base.isequal(n1::Node, n2::Node) = n1.position == n2.position
+
 
 function faces(pos::Position)::Array{Face}
     δ = 0.001

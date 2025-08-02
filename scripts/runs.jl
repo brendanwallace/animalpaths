@@ -11,7 +11,7 @@ function main()
     #     seriesName = ARGS[1]
     # end
 
-    # COMFORTS = Dict(2.0 => 0.3, 10.0 => 0.5, 5.0 => 0.4)
+    COMFORTS = Dict(2.0 => 0.3, 4.0 => 0.4, 8.0 => 0.5)
     FOLDER = "data/$(seriesName)|$(today())"
     datafile = "$(FOLDER)/data.json"
     mkpath("$(FOLDER)")
@@ -33,11 +33,9 @@ function main()
 
     for searchStrategy ∈ searchStrategies
         for maxCost ∈ maxCosts
+            comfort = COMFORTS[maxCost]
             for ratio ∈ improvementRatios
                 for boundaryCondition ∈ boundaryConditions
-                    # if searchStrategy == Paths.GRADIENT_WALKER
-                    # comfort = COMFORTS[maxCost]
-                    # end
                     for pR ∈ PRs
                         for patchLogic ∈ patchLogics
                             pI = pR * ratio
@@ -63,7 +61,7 @@ function main()
                                             boundaryConditions=boundaryCondition,
                                             numLocations=nLocations,
                                             numWalkers=numWalkers,
-                                            # comfortWeight=comfort,
+                                            comfortWeight=comfort,
                                         )
 
                                         simulationResult = Paths.SimulationResult(settings)
@@ -73,7 +71,7 @@ function main()
                                         push!(simulationResult.snapshots, Paths.takeSnapshot(sim))
 
                                         for f ∈ 1:F
-                                            print("\r$(nLocations)/$(numLocations) $(boundaryCondition)/$(boundaryConditions) $(maxCost)/$(maxCosts) $(pR)/$(PRs) $(ratio)/$(improvementRatios) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
+                                            print("\r$(nLocations)/$(numLocations) $(boundaryCondition)/$(boundaryConditions) $(maxCost)/$(length(maxCosts)) $(pR)/$(PRs) $(ratio)/$(length(improvementRatios)) $(patchLogic) $(i)/$(totalI) $(f)/$(F)")
 
                                             for u ∈ 1:upf
                                                 Paths.update!(sim)
@@ -98,7 +96,7 @@ function main()
 
                                         end
 
-                                        # This writes out the intermediate data every run (I think).
+                                        # This writes out the intermediate data every run.
                                         serialize(datafile, simulationResults)
                                         open(datafile, "w") do io
                                             JSON3.write(io, simulationResults)

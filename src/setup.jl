@@ -33,8 +33,13 @@ function MakeSimulation(settings::Settings)::Simulation
 
     if settings.patchRecovery == nothing
         @assert settings.patchImprovement == nothing
+        if settings.trailBudget == nothing
+            settings.trailBudget = DEFAULT_TRAIL_BUDGET
+            settings.trailLifetime = DEFAULT_TRAIL_LIFETIME
+        end
         settings.patchRecovery = 1.0 / settings.trailLifetime
         settings.patchImprovement = settings.trailBudget * settings.X / settings.numWalkers / settings.trailLifetime
+        
     else
         @assert settings.trailBudget == nothing
         @assert settings.trailLifetime == nothing
