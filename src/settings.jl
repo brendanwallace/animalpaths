@@ -84,14 +84,14 @@ end
     Time for a fully improved trail to decay back to 0 improvement, assuming
     linear decay.
     """
-    trailLifetime::Float64 = nothing
+    trailLifetime = nothing
 
 
     """
     Length of trail, in units of X, that the existing number of walkers can
     support if they all walk continuously over one length of trail.
     """
-    trailBudget::Float64 = nothing
+    trailBudget = nothing
 
     diffusionRadius::Integer = 3
     diffusionGaussianVariance::Float64 = 1.0
