@@ -18,16 +18,18 @@ function viz(sim; showtext=true, showwalkers=true, showlocations=true, markersiz
     X = sim.settings.X
     Y = sim.settings.Y
     discounts = sim.settings.maxCost .- costs(sim.world)
-    patches = heatmap(1.5:(X+0.5), 1.5:(Y+0.5), transpose(discounts), axis=([], false), clims=(0, sim.settings.maxCost - 1), legend=nothing, aspect_ratio=:equal)
+
+    discounts = reverse(discounts, dims=1)
+    patches = heatmap(1.5:(X+0.5), 1.5:(Y+0.5), discounts, axis=([], false), clims=(0, sim.settings.maxCost - 1), legend=nothing, aspect_ratio=:equal)
     if showwalkers
         walkers = scatter!(
-            [(w.position[1], w.position[2]) for w in sim.walkers],
+            [(w.position[1], Y - w.position[2]) for w in sim.walkers],
             label="", axis=([], false), color="#1f77b4", markersize=markersize,
         )
     end
     if showlocations
         locations = scatter!(
-            [(l.position[1], l.position[2]) for l in sim.locations],
+            [(l.position[1], Y - l.position[2]) for l in sim.locations],
             label="", axis=([], false), color="#ff7f0e", markersize=markersize,
         )
     end

@@ -73,8 +73,7 @@ def describe(df):
     print(df.columns)
 
 
-def plot_patches(df, MAX_IMAGES=32):
-    IM_PER_ROW = 4
+def plot_patches(df, IM_PER_ROW=4, MAX_IMAGES=32):
 
     if len(df) < MAX_IMAGES:
         MAX_IMAGES = len(df)

@@ -1,0 +1,9 @@
+ Abstract:
+
+When a person (or an animal) walks through rough terrain, they flatten it down, making it easier for subsequent travelers to walk the same way. When multiple people (or animals) walk between multiple destinations, this positive feedback leads to the emergence of a network of paths. Little is known of the topology, dynamics, stability and other properties of such emergent transportation networks.
+
+This talk describes a computational modeling approach to understanding these networks. Agents in a simple simulation walk between points of interest across a continuous 2D space; as they walk they decrease the "cost" of walking over the same patch of ground, and they plan their movements to always take the least-cost paths to their destinations. I consider the dual optimization problem of simultaneously minimizing travel costs between points of interest in the network and total amount of path improvement; within this framework I try to understand the efficiencies of the emergent networks, and how efficiencies vary with environmental parameters, behavioral parameters, and other network measures. I discuss implications to urban planning and transportation system design as well as animal behavior and collective behavior in general.
+
+Bio:
+
+Brendan is a PhD student in the QERM program at the University of Washington. He's interested in using a multi-disciplinary approach to modeling complex systems, in particular those related to movement ecology and crossovers between ecological and human/urban systems. Brendan completed his BS in applied math at Brown University, his MS in applied math at the University of Washington, and previously worked on modeling and predicting road speeds and travel times for Google maps.

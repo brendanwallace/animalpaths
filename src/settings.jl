@@ -99,7 +99,7 @@ end
 
     diffusionRadius::Integer = 3
     diffusionGaussianVariance::Float64 = 1.0
-    improvementLogic::PatchLogic = LOGISTIC
-    recoveryLogic::PatchLogic = LOGISTIC
+    improvementLogic::PatchLogic = LINEAR
+    recoveryLogic::PatchLogic = LINEAR
     boundaryConditions::BoundaryConditions = SOLID
 end

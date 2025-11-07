@@ -33,7 +33,7 @@ function main()
 
     for searchStrategy ∈ searchStrategies
         for maxCost ∈ maxCosts
-            comfort = COMFORTS[maxCost]
+            # comfort = COMFORTS[maxCost]
             for ratio ∈ improvementRatios
                 for boundaryCondition ∈ boundaryConditions
                     for pR ∈ PRs
@@ -61,7 +61,7 @@ function main()
                                             boundaryConditions=boundaryCondition,
                                             numLocations=nLocations,
                                             numWalkers=numWalkers,
-                                            comfortWeight=comfort,
+                                            # comfortWeight=comfort,
                                         )
 
                                         simulationResult = Paths.SimulationResult(settings)
