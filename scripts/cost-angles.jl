@@ -12,19 +12,19 @@ numWalkers = 10
 
 # costs-angles doesn't really make sense with periodic boundaries.
 boundaryConditions = [Paths.SOLID]
-seriesName = "cost-angles-fig"
+seriesName = "cost-angles-single"
 
 
 # What data to save.
 # Costs-angles needs to save all of this.
 SHORTEST_PATHS = true
-SAVE_PATHS = false # <-- might not want to save this actually.
+SAVE_PATHS = true # <-- might not want to save this actually.
 SAVE_HEADINGS = true
 SAVE_PATCHES = true
 
 
 
-# 11/7 costs run
+# 11/12 costs run, for a single set of paths
 searchStrategies = [Paths.KANAI_SUZUKI]
 upf = 1000
 F = 20
@@ -33,8 +33,8 @@ improvementRatios = [100]
 PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
 numLocations = [15]
-NUM_REPLICAS = 4
-LOCATION_CONFIGURATIONS = [2]
+NUM_REPLICAS = 1
+LOCATION_CONFIGURATIONS = [1]
 
 
 
@@ -44,6 +44,24 @@ include("runs.jl")
 
 
 """
+
+
+
+# 11/7-10 costs runs
+searchStrategies = [Paths.KANAI_SUZUKI]
+upf = 1000
+F = 20
+maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
+improvementRatios = [100]
+PRs = [0.001]
+boundaryConditions = [Paths.SOLID]
+numLocations = [15]
+NUM_REPLICAS = 4
+LOCATION_CONFIGURATIONS = [1, 2]
+
+
+
+
 # 8/1 costs run
 searchStrategies = [Paths.KANAI_SUZUKI]
 upf = 1000

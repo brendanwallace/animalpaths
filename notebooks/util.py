@@ -72,6 +72,10 @@ def describe(df):
     print("steps:", df["steps"].max())
     print(df.columns)
 
+def plot_patch(r):
+    plt.imshow(np.reshape(r["patches"], (100, 100)), cmap="inferno")
+    plt.axis("off")
+
 
 def plot_patches(df, IM_PER_ROW=4, MAX_IMAGES=32):
 

@@ -20,7 +20,7 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
-searchStrategies = [Paths.GRADIENT_WALK, Paths.HEURISTIC_WALK]
+searchStrategies = [Paths.KANAI_SUZUKI]
 improvementRatios = [
 	10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0,
 	90.0, 100.0, 110.0, 120.0, 130.0, 140.0, 150.0,
@@ -28,9 +28,9 @@ improvementRatios = [
 ]
 NUM_REPLICAS = 8
 LOCATION_CONFIGURATIONS = [1, 2]
-numLocations = [10]
-F = 100
-upf = 100
+numLocations = [8, 16, 32]
+F = 10
+upf = 1000
 maxCosts = [2.0, 8.0]
 PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
