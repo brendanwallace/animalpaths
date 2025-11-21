@@ -26,7 +26,7 @@ improvementRatios = [
 	90.0, 100.0, 110.0, 120.0, 130.0, 140.0, 150.0,
 	160.0, 170.0, 180.0, 190.0, 200.0,
 ]
-NUM_REPLICAS = 8
+NUM_REPLICAS = 2
 LOCATION_CONFIGURATIONS = [1, 2]
 numLocations = [8, 16, 32]
 F = 10
