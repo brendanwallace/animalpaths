@@ -21,9 +21,9 @@ SAVE_PATCHES = true
 # TODO - refactor improvement ratio, eventually
 F = 20
 upf = 1000
-maxCosts = [2.0]
+maxCosts = [2.0, 8.0]
 improvementRatios = [10]
-PRs = [0.001, 0.002]
+PRs = [0.001, 0.0005]
 boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
 numLocations = [8, 16]
 LOCATION_CONFIGURATIONS = [1, 2]
