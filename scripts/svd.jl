@@ -23,13 +23,13 @@ F = 20
 upf = 1000
 maxCosts = [2.0]
 improvementRatios = [10]
-PRs = [0.001]
+PRs = [0.001, 0.002]
 boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
-numLocations = [10]
+numLocations = [8, 16]
 LOCATION_CONFIGURATIONS = [1, 2]
 NUM_REPLICAS = 64
-numWalkers = 100
-searchStrategies = [Paths.GRID_WALK_8, Paths.KANAI_SUZUKI]
+numWalkers = 10
+searchStrategies = [Paths.KANAI_SUZUKI]
 
 
 # Includes the shared `main` function.
