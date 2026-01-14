@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-seriesName = "SVD"
+seriesName = "SVD-zoom"
 
 # Data to save.
 SHORTEST_PATHS = false
@@ -17,8 +17,28 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
-# 7/24 SVD run with two search strategies and 100 walkers.
-# TODO - refactor improvement ratio, eventually
+# 01/14/2026 zoom-in run for SVD figure.
+F = 100
+upf = 1000
+maxCosts = [2.0]
+improvementRatios = [100.0]
+PRs = [0.001]
+boundaryConditions = [Paths.PERIODIC]
+numLocations = [8]
+LOCATION_CONFIGURATIONS = [1]
+NUM_REPLICAS = 128
+numWalkers = 10
+searchStrategies = [Paths.KANAI_SUZUKI]
+
+
+# Includes the shared `main` function.
+include("runs.jl")
+
+
+
+"""
+# 01/09/2026 run for SVD figure.
+
 F = 20
 upf = 1000
 maxCosts = [2.0, 8.0]
@@ -32,12 +52,6 @@ numWalkers = 10
 searchStrategies = [Paths.KANAI_SUZUKI]
 
 
-# Includes the shared `main` function.
-include("runs.jl")
-
-
-
-"""
 # 7/21 SVD run with other search strategies
 searchStrategies = [Paths.GRID_WALK_8, Paths.GRID_WALK_4]
 F = 20
