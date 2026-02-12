@@ -28,9 +28,10 @@ function main()
     i = 1
     totalI = (length(maxCosts) * length(PRs) * length(improvementRatios) * length(numLocations)
               * length(patchLogics) * length(boundaryConditions) * NUM_REPLICAS * length(LOCATION_CONFIGURATIONS)
-              * length(searchStrategies)
+              * length(searchStrategies) * length(sideLengthFactors) * length(scenarios)
               )
 
+for scenario ∈ scenarios
     for searchStrategy ∈ searchStrategies
         for maxCost ∈ maxCosts
             # comfort = COMFORTS[maxCost]
@@ -38,7 +39,9 @@ function main()
                 for boundaryCondition ∈ boundaryConditions
                     for pR ∈ PRs
                         for patchLogic ∈ patchLogics
-                            pI = pR * ratio
+                            for sideLengthFactor ∈ sideLengthFactors
+
+                            pI = pR * ratio * sideLengthFactor * sideLengthFactor
 
                             for nLocations ∈ numLocations
 
@@ -49,7 +52,7 @@ function main()
 
                                         settings = Paths.Settings(
                                             maxCost=maxCost,
-                                            scenario=Paths.RANDOM_FIXED,
+                                            scenario=scenario,
                                             searchStrategy=searchStrategy,
                                             patchImprovement=pI,
                                             patchRecovery=pR,
@@ -61,6 +64,8 @@ function main()
                                             boundaryConditions=boundaryCondition,
                                             numLocations=nLocations,
                                             numWalkers=numWalkers,
+                                            X=100*sideLengthFactor,
+                                            Y=100*sideLengthFactor,
                                             # comfortWeight=comfort,
                                         )
 
@@ -111,6 +116,8 @@ function main()
             end
         end
     end
+end
+end
     # return simulationResults
     open(datafile, "w") do io
         JSON3.write(io, simulationResults)

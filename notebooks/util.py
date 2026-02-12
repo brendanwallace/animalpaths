@@ -110,15 +110,13 @@ def svd(_all, steps, plot=True, demean=False, dynamics=True):
     N = len(df)
 
     if plot:
-        fig, axs = plt.subplots(2, 1)
         s = S**2/sum(S**2)
-        axs[0].bar([x for x in range(N)], S[:N]),
-        axs[1].bar([x for x in range(N)], s[:N]),
+        plt.bar([x for x in range(N)], s[:N]),
         
         # plot the eigen-trails
-        fig, axs = plt.subplots(2, 4)
-        for i in range(8):
-            ax = axs[i//4, i%4]
+        fig, axs = plt.subplots(4)
+        for i in range(4):
+            ax = axs[i]
             ax.imshow(np.reshape(Vh[i], (100, 100)), cmap="inferno")
             ax.axis('off')
             ax.set_title(f"{round(s[i], 2)}, {round(S[i] / sum(S), 2)}")
@@ -133,23 +131,32 @@ def svd(_all, steps, plot=True, demean=False, dynamics=True):
         for i in range(DIMENSIONS_TO_SHOW):
             _all[f"U{i}"] = _all["patches"].map(lambda p: p @ Vh.T[:, i])
 
+        # every dot needs to know its final U1, for the lineplot below.
+        final = _all[_all["steps"] == steps]
+
+        U1s = {}
+        for _, r in final.iterrows():
+            U1s[r["settings.randomSeedWalkers"]] = r["U1"]
+
+        _all["finalU1"] = _all.apply(lambda r: U1s[r["settings.randomSeedWalkers"]], axis=1)
+
         # scatter plot of the first & second components
-        sns.scatterplot(data=_all[_all["steps"] == steps], x="U1", y="U2")
+        sns.scatterplot(data=_all[_all["steps"] == steps], x="U1", y="U2", hue="finalU1")
         plt.show()
-        sns.scatterplot(data=_all[_all["steps"] >= (steps - 10000)], x="U1", y="U2")
+        sns.scatterplot(data=_all[_all["steps"] >= (steps - 10000)], x="U1", y="U2", hue="finalU1")
         plt.show()
 
         fig, axs = plt.subplots(2, int(DIMENSIONS_TO_SHOW/2))
 
         for i in range(DIMENSIONS_TO_SHOW):
             sns.lineplot(data=_all[_all["steps"] >= 0], x="steps", y=f"U{i}", ax=axs[i//2, i%2],
-                     hue="settings.randomSeedWalkers", style="settings.boundaryConditions", legend=False)
+                     hue="finalU1", style="settings.boundaryConditions", legend=False)
         plt.show()
 
 
 
         sns.relplot(data=_all[_all["steps"] == steps], y="averageTravelCost",
-            hue="U1", x="totalImprovement", style="settings.boundaryConditions")
+            hue="finalU1", x="totalImprovement", style="settings.boundaryConditions")
         plt.show()
 
 

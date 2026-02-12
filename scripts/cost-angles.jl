@@ -35,6 +35,8 @@ boundaryConditions = [Paths.SOLID]
 numLocations = [15]
 NUM_REPLICAS = 1
 LOCATION_CONFIGURATIONS = [1]
+sideLengthFactors = [1.0]
+scenarios = [Paths.RANDOM_FIXED]
 
 
 

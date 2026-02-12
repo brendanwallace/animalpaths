@@ -411,7 +411,10 @@ function shortestPathKanaiSuzuki(
         # Step 3 - a-star G_n
         neighbors = (n) -> [(e.node, e.cost + ϵ) for e in n.neighbors]
         # h = n->norm(n.position .- nodesByPosition[target].position)
-        path, newPathCost = astar(nodesByPosition[source], nodesByPosition[target], neighbors, heuristic)
+
+        from = nodesByPosition[source]
+        to = nodesByPosition[target]
+        path, newPathCost = astar(from, to, neighbors, heuristic)
         delta = abs(pathCost - newPathCost)
         pathCost = newPathCost
         @debug "search $(i) found path of cost $(pathCost), delta $(delta), $([p.position for p in path])"

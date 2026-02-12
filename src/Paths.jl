@@ -67,6 +67,11 @@ include("visualize.jl")
     Paths.update!(heuristicsearch)
     Paths.update!(heuristicsearch)
     @test heuristicsearch isa Paths.Simulation
+
+
+    wallToWall = Paths.MakeSimulation(Paths.Settings(scenario=Paths.WALL_TO_WALL, numWalkers=1, X=10, Y=10, numLocations=2))
+    Paths.update!(wallToWall)
+    @test wallToWall isa Paths.Simulation
 end
 
 

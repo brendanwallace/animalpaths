@@ -29,7 +29,8 @@ LOCATION_CONFIGURATIONS = [1]
 NUM_REPLICAS = 128
 numWalkers = 10
 searchStrategies = [Paths.KANAI_SUZUKI]
-
+sideLengthFactors = [1.0]
+scenarios = [Paths.RANDOM_FIXED]
 
 # Includes the shared `main` function.
 include("runs.jl")

@@ -26,6 +26,10 @@ Measures features of the network at a snapshot in time.
     patches::Array{Float64} = []
 
     # anglesHistogram # Not sure what the type of this is.
+
+    locations::Array{Position} = []
+    walkers::Array{Position} = []
+
 end
 
 
@@ -212,6 +216,18 @@ function takeSnapshot(sim::Paths.Simulation;
 
     snapshot = Snapshot()
 
+    # only save location positions for the first snapshot
+    if sim.steps == 0
+        for location in sim.locations
+            push!(snapshot.locations, location.position)
+        end
+    end
+
+    for walker in sim.walkers
+        push!(snapshot.walkers, walker.position)
+    end
+
+
     if shortestpaths
         n = 0.0
         totalCost = 0.0
@@ -249,6 +265,7 @@ function takeSnapshot(sim::Paths.Simulation;
     if savepatches
         snapshot.patches = deepcopy(sim.world.patches)
     end
+
 
     return snapshot
 end

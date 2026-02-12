@@ -9,7 +9,7 @@ import Paths
 # Invariant.
 patchLogics = [Paths.LINEAR]
 numWalkers = 10
-seriesName = "example-fig"
+seriesName = "example-small"
 
 
 # Data to save.
@@ -25,11 +25,13 @@ improvementRatios = [100.0]
 NUM_REPLICAS = 1
 LOCATION_CONFIGURATIONS = [1]
 numLocations = [16]
-F = 20000
+F = 10000
 upf = 2
 maxCosts = [2.0]
 PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
+sideLengthFactors = [1.0]
+scenarios = [Paths.RANDOM_FIXED]
 
 
 """

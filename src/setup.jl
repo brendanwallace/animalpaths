@@ -58,6 +58,11 @@ function MakeSimulation(settings::Settings)::Simulation
         sim.locations = []
     elseif settings.scenario == TRIANGLE
         sim.locations = [Location((5.0, 5.0)), Location((20.0, 5.0)), Location((35.0, 5.0 + sqrt(3) * 15.0))]
+    elseif settings.scenario == CENTRAL_PLACE
+        # This is the shared center:
+        sim.locations = [Location(((settings.X - 1) / 2.0, (settings.X - 1) / 2.0))]
+    elseif settings.scenario == WALL_TO_WALL
+        sim.locations = []
     else
         throw("unhandled scenario $(settings.scenario)")
     end

@@ -34,6 +34,8 @@ upf = 1000
 maxCosts = [2.0, 8.0]
 PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
+sideLengthFactors = [1.0]
+scenarios = [Paths.RANDOM_FIXED]
 
 
 """
