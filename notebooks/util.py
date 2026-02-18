@@ -50,6 +50,8 @@ def load_data(datafile):
                                    ["settings", "recoveryLogic"],
                                    ["settings", "improvementLogic"],
                                    ["settings", "searchStrategy"],
+                                   ["settings", "scenario"],
+                                   ["settings", "X"],
                                 ])
 
     # hopefully won't be necessary forever
@@ -69,6 +71,8 @@ def describe(df):
     print("random locations seeds:", len(df["settings.randomSeedLocations"].unique()))
     print("patch recovery logic:", df["settings.recoveryLogic"].unique())
     print("settings.searchStrategy :", df["settings.searchStrategy"].unique())
+    print("settings.scenario :", df["settings.scenario"].unique())
+    print("settings.X :", df["settings.X"].unique())
     print("steps:", df["steps"].max())
     print(df.columns)
 

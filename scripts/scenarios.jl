@@ -17,12 +17,12 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
-F = 100
-upf = 1000
-maxCosts = [2.0, 8.0]
-improvementRatios = [100.0, 200.0, 400.0]
+F = 200
+upf = 100
+maxCosts = [2.0, 4.0, 8.0]
+improvementRatios = [50.0, 100.0, 200.0]
 PRs = [0.001]
-boundaryConditions = [Paths.PERIODIC]
+boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
 numLocations = [8]
 LOCATION_CONFIGURATIONS = [1]
 NUM_REPLICAS = 2
