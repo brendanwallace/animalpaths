@@ -52,7 +52,10 @@ function shortestPath(
 
     if settings.searchStrategy ∈ [KANAI_SUZUKI, DIRECT_WALK, GRADIENT_WALK]
         # use exact search for these.
-        return shortestPathKanaiSuzuki(source, target, costs(world), numSteinerPoints=settings.numSteinerPoints)
+        return shortestPathKanaiSuzuki(source, target, costs(world),
+            numSteinerPoints=settings.numSteinerPoints,
+            bc=settings.boundaryConditions,
+            )
     elseif settings.searchStrategy ∈ [GRID_WALK_4, GRID_WALK_HEX, GRID_WALK_HEX_PLUS, GRID_WALK_8]
 
         return gridSearch(source, target, world, settings)

@@ -76,22 +76,24 @@ def describe(df):
     print("steps:", df["steps"].max())
     print(df.columns)
 
-def plot_patch(r):
-    plt.imshow(np.reshape(r["patches"], (100, 100)), cmap="inferno")
-    plt.axis("off")
+# I think these are now unused:
+#
+# def plot_patch(r):
+#     plt.imshow(np.reshape(r["patches"], (100, 100)), cmap="inferno")
+#     plt.axis("off")
 
 
-def plot_patches(df, IM_PER_ROW=4, MAX_IMAGES=32):
+# def plot_patches(df, IM_PER_ROW=4, MAX_IMAGES=32):
 
-    if len(df) < MAX_IMAGES:
-        MAX_IMAGES = len(df)
+#     if len(df) < MAX_IMAGES:
+#         MAX_IMAGES = len(df)
 
-    fig, axs = plt.subplots(math.ceil(MAX_IMAGES / IM_PER_ROW), IM_PER_ROW)
-    for i in range(MAX_IMAGES):
-        ax = axs[i//IM_PER_ROW, i%IM_PER_ROW]
-        ax.imshow(np.reshape(df["patches"].iloc[i], (100, 100)), cmap="inferno")
-        ax.axis('off')
-    plt.show()
+#     fig, axs = plt.subplots(math.ceil(MAX_IMAGES / IM_PER_ROW), IM_PER_ROW)
+#     for i in range(MAX_IMAGES):
+#         ax = axs[i//IM_PER_ROW, i%IM_PER_ROW]
+#         ax.imshow(np.reshape(df["patches"].iloc[i], (100, 100)), cmap="inferno")
+#         ax.axis('off')
+#     plt.show()
 
 def svd(_all, steps, plot=True, demean=False, dynamics=True):
 
