@@ -17,6 +17,29 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
+# 05/22/2026 rerun to fix costs subfigures
+F = 20
+upf = 1000
+maxCosts = [2.0, 8.0]
+improvementRatios = [100.0]
+PRs = [0.001, 0.0005]
+boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
+numLocations = [8, 16]
+LOCATION_CONFIGURATIONS = [1, 2]
+NUM_REPLICAS = 64
+numWalkers = 10
+searchStrategies = [Paths.KANAI_SUZUKI]
+sideLengthFactors = [1.0]
+scenarios = [Paths.RANDOM_FIXED]
+
+
+
+# Includes the shared `main` function.
+include("runs.jl")
+
+
+
+"""
 # 01/14/2026 zoom-in run for SVD figure.
 F = 100
 upf = 1000
@@ -32,12 +55,6 @@ searchStrategies = [Paths.KANAI_SUZUKI]
 sideLengthFactors = [1.0]
 scenarios = [Paths.RANDOM_FIXED]
 
-# Includes the shared `main` function.
-include("runs.jl")
-
-
-
-"""
 # 01/09/2026 run for SVD figure.
 
 F = 20
