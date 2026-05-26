@@ -34,6 +34,11 @@ def add_letter(subfig, xoffset, yoffset, letter):
         transform = subfig.transSubfigure,
         size=20, weight='bold')
 
+def add_number(ax, xoffset, yoffset, number):
+    ax.text(xoffset, yoffset, number,
+        transform = ax.transAxes,
+        size=15, weight='bold')
+
 # This cmap is just for these 3 colors. We could change these.
 palette = "rocket"
 COLORS = [
