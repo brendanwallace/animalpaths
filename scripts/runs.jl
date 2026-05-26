@@ -87,7 +87,7 @@ for scenario ∈ scenarios
                                                 push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
                                                     shortestpaths=true,
                                                     savepaths=SAVE_PATHS, # don't default to saving these.
-                                                    saveheadings=true,
+                                                    saveheadings=SAVE_HEADINGS, # don't default to saving these either.
                                                     savepatches=true,
                                                 ))
                                             else
