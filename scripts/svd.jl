@@ -14,7 +14,7 @@ seriesName = "SVD-zoom"
 SHORTEST_PATHS = false
 SAVE_PATHS = false
 SAVE_HEADINGS = false
-SAVE_PATCHES = false
+SAVE_PATCHES = true
 
 
 # 05/22/2026 rerun to fix costs subfigures
