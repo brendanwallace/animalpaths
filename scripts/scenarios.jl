@@ -29,7 +29,7 @@ NUM_REPLICAS = 2
 numWalkers = 10
 searchStrategies = [Paths.KANAI_SUZUKI]
 sideLengthFactors = [1, 2] # multiply side lengths and pI by this factor
-scenarios = [Paths.RANDOM_DYNAMIC, Paths.CENTRAL_PLACE, Paths.WALL_TO_WALL]
+scenarios = [Paths.RANDOM_FIXED, Paths.RANDOM_DYNAMIC, Paths.CENTRAL_PLACE, Paths.WALL_TO_WALL]
 
 
 
