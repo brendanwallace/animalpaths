@@ -17,7 +17,7 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
-F = 200
+F = 100
 upf = 100
 maxCosts = [2.0, 4.0, 8.0]
 improvementRatios = [50.0, 100.0, 200.0]

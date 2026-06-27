@@ -85,7 +85,8 @@ for scenario ∈ scenarios
                                             # We should always save all the information for the final snapshot.
                                             if f == F
                                                 push!(simulationResult.snapshots, Paths.takeSnapshot(sim,
-                                                    shortestpaths=true,
+                                                    # shortestpaths=true,
+                                                    shortestpaths=SHORTEST_PATHS,
                                                     savepaths=SAVE_PATHS, # don't default to saving these.
                                                     saveheadings=SAVE_HEADINGS, # don't default to saving these either.
                                                     savepatches=true,
@@ -100,6 +101,8 @@ for scenario ∈ scenarios
                                             end
 
                                         end
+
+                                        # print(simulationResults)
 
                                         # This writes out the intermediate data every run.
                                         serialize(datafile, simulationResults)
