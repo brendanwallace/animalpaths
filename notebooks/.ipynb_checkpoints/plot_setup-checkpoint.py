@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 CMAP = "RdPu"
 
 # Legends and axis labels.
-FONTSIZE = 9
+FONTSIZE = 12
 
 # This may or may not do anything if we're exporting to .svgs. Who knows.
 DPI = 600

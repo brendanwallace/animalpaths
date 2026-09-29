@@ -24,7 +24,7 @@ SAVE_PATCHES = true
 
 
 
-# 11/12 costs run, for a single set of paths
+# 09/29/26 costs run, reproduce data that I deleted
 searchStrategies = [Paths.KANAI_SUZUKI]
 upf = 1000
 F = 20
@@ -32,9 +32,9 @@ maxCosts = [1.25, 1.5, 2.0, 3.0, 5.0, 9.0, 17.0, 33.0, 65.0]
 improvementRatios = [100]
 PRs = [0.001]
 boundaryConditions = [Paths.SOLID]
-numLocations = [15]
-NUM_REPLICAS = 1
-LOCATION_CONFIGURATIONS = [1]
+numLocations = [10, 15, 20]
+NUM_REPLICAS = 4
+LOCATION_CONFIGURATIONS = [1, 2]
 sideLengthFactors = [1.0]
 scenarios = [Paths.RANDOM_FIXED]
 
