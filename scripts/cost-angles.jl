@@ -12,7 +12,7 @@ numWalkers = 10
 
 # costs-angles doesn't really make sense with periodic boundaries.
 boundaryConditions = [Paths.SOLID]
-seriesName = "cost-angles-single"
+seriesName = "cost-angles"
 
 
 # What data to save.
