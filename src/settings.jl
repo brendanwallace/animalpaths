@@ -59,6 +59,7 @@ const STEP_WALKS = [DIRECT_WALK, GRADIENT_WALK, HEURISTIC_WALK]
 @enum BoundaryConditions begin
     SOLID = 1
     PERIODIC = 2
+    PERIODIC_Y = 3
 end
 
 

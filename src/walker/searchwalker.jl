@@ -75,6 +75,9 @@ function update!(walker::SearchWalker)
             stepLength = periodicNorm(nextPosition, walker.position,
                 walker.simulation.settings.X,
                 walker.simulation.settings.Y)
+        elseif walker.simulation.settings.boundaryConditions == PERIODIC_Y
+            stepLength = periodicYNorm(nextPosition, walker.position,
+                walker.simulation.settings.Y)
         end
 
         # @debug "nextPosition: $(nextPosition), stepLength: $(stepLength), travelBudget: $(travelBudget)"
