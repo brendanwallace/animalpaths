@@ -28,7 +28,7 @@ LOCATION_CONFIGURATIONS = [1]
 NUM_REPLICAS = 2
 numWalkers = 10
 searchStrategies = [Paths.KANAI_SUZUKI]
-sideLengthFactors = [1] # multiply side lengths and pI by this factor
+sideLengthFactors = [1, 2] # multiply side lengths and pI by this factor
 scenarios = [Paths.RANDOM_DYNAMIC]
 
 
