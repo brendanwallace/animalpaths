@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-seriesName = "cost_vs_ratio_pI"
+seriesName = "cost_vs_ratio_test"
 
 # Data to save.
 SHORTEST_PATHS = false
@@ -17,8 +17,8 @@ SAVE_HEADINGS = false
 SAVE_PATCHES = true
 
 
-F = 10
-upf = 1000
+F = 1
+upf = 1
 maxCosts = range(start=1.0, stop=8.0, step=1.0)
 improvementRatios = [50.0, 100.0, 200.0]
 PRs = [0.001, 0.002]

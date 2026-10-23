@@ -47,7 +47,7 @@ for replica ∈ 1:NUM_REPLICAS
 
 
                             # TODO - test this.
-                            pI = pI * sideLengthFactor
+                            pI = pR * ratio * sideLengthFactor
                             # This is to correct for time. We should standardize time
                             # by how long it takes to walk from one end to the other of
                             # the simulation.
