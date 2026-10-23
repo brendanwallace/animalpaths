@@ -8,7 +8,7 @@ import Paths
 
 # Invariant.
 patchLogics = [Paths.LINEAR]
-seriesName = "cost_vs_ratio"
+seriesName = "cost_vs_ratio_pI"
 
 # Data to save.
 SHORTEST_PATHS = false
@@ -19,16 +19,16 @@ SAVE_PATCHES = true
 
 F = 10
 upf = 1000
-maxCosts = range(start=1.0, stop=16.0, step=1.0)
+maxCosts = range(start=1.0, stop=8.0, step=1.0)
 improvementRatios = [50.0, 100.0, 200.0]
-PRs = [0.001]
+PRs = [0.001, 0.002]
 boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
 numLocations = [16]
 LOCATION_CONFIGURATIONS = [1]
-NUM_REPLICAS = 2
+NUM_REPLICAS = 1
 numWalkers = 10
 searchStrategies = [Paths.KANAI_SUZUKI]
-sideLengthFactors = [2] # multiply side lengths and pI by this factor
+sideLengthFactors = [1, 2] # multiply side lengths and pI by this factor
 scenarios = [Paths.RANDOM_DYNAMIC]
 
 
@@ -44,14 +44,14 @@ F = 10
 upf = 1000
 maxCosts = range(start=1.0, stop=16.0, step=1.0)
 improvementRatios = [50.0, 100.0, 200.0]
-PRs = [0.001]
+PRs = [0.001, 0.002]
 boundaryConditions = [Paths.PERIODIC, Paths.SOLID]
 numLocations = [16]
 LOCATION_CONFIGURATIONS = [1]
 NUM_REPLICAS = 2
 numWalkers = 10
 searchStrategies = [Paths.KANAI_SUZUKI]
-sideLengthFactors = [2] # multiply side lengths and pI by this factor
+sideLengthFactors = [1, 2] # multiply side lengths and pI by this factor
 scenarios = [Paths.RANDOM_DYNAMIC]
 
 

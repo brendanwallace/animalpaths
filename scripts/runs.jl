@@ -31,24 +31,35 @@ function main()
               * length(searchStrategies) * length(sideLengthFactors) * length(scenarios)
               )
 
-for scenario ∈ scenarios
-    for searchStrategy ∈ searchStrategies
-        for maxCost ∈ maxCosts
-            # comfort = COMFORTS[maxCost]
-            for ratio ∈ improvementRatios
-                for boundaryCondition ∈ boundaryConditions
-                    for pR ∈ PRs
-                        for patchLogic ∈ patchLogics
-                            for sideLengthFactor ∈ sideLengthFactors
+for replica ∈ 1:NUM_REPLICAS
+    for scenario ∈ scenarios
+        for searchStrategy ∈ searchStrategies
+            for sideLengthFactor ∈ sideLengthFactors
+                for maxCost ∈ maxCosts
+                    # comfort = COMFORTS[maxCost]
+                    for ratio ∈ improvementRatios
+                        for boundaryCondition ∈ boundaryConditions
+                            for pR ∈ PRs
+                                for patchLogic ∈ patchLogics
 
-                            pI = pR * ratio * sideLengthFactor * sideLengthFactor
+                            # pI = pR * ratio
+                            # pI = pI * sideLengthFactor * sideLengthFactor
+
+
+                            # TODO - test this.
+                            pI = pI * sideLengthFactor
+                            # This is to correct for time. We should standardize time
+                            # by how long it takes to walk from one end to the other of
+                            # the simulation.
+                            pR = pR / sideLengthFactor
+
+
 
                             for nLocations ∈ numLocations
 
                                 for locationSeed ∈ LOCATION_CONFIGURATIONS
 
 
-                                    for replica ∈ 1:NUM_REPLICAS
 
                                         settings = Paths.Settings(
                                             maxCost=maxCost,
