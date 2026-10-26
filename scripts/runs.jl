@@ -42,16 +42,16 @@ for replica ∈ 1:NUM_REPLICAS
                             for pR ∈ PRs
                                 for patchLogic ∈ patchLogics
 
-                            # pI = pR * ratio
-                            # pI = pI * sideLengthFactor * sideLengthFactor
+                            pI = pR * ratio
+                            pI = pI * sideLengthFactor * sideLengthFactor
 
 
-                            # TODO - test this.
-                            pI = pR * ratio * sideLengthFactor
-                            # This is to correct for time. We should standardize time
-                            # by how long it takes to walk from one end to the other of
-                            # the simulation.
-                            pR = pR / sideLengthFactor
+                            # # TODO - test this.
+                            # pI = pR * ratio * sideLengthFactor
+                            # # This is to correct for time. We should standardize time
+                            # # by how long it takes to walk from one end to the other of
+                            # # the simulation.
+                            # pR = pR / sideLengthFactor
 
 
 
